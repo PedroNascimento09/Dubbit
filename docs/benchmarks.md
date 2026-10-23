@@ -25,8 +25,9 @@ the model, the profile, the operating system, the processor and the memory.
 | Profile | light, auto-selected |
 | System | Windows 11, 12 logical cores, 15 GB of RAM |
 | Graphics | Discrete adapter detected, not used for inference |
-| Wall time | about 1.0 s for the whole command, including audio extraction |
-| Ratio | about 7x faster than real time |
+| Build | release, `cargo build --release` |
+| Wall time | 1.86 s, 1.70 s and 1.70 s over three runs, whole command, including audio extraction |
+| Ratio | about 4x faster than real time |
 
 ### What this measurement does not say
 
