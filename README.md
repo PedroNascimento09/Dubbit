@@ -99,13 +99,15 @@ All four entries are pinned by URL, byte size and SHA-256 in [models/whisper.jso
 
 ## Performance
 
-One measurement, made by the author on Windows 11, 12 cores, 15 GB of RAM, no usable graphics acceleration, with `whisper-tiny-q5_1`:
+Measured by the author on Windows 11, 12 logical cores, 15 GB of RAM, no graphics acceleration used, release build, on a 13 min 37 s (817 s) speech file, inside a hard 8 GiB memory cap that covers the recogniser too:
 
-| Audio | Wall time | Ratio |
-| --- | --- | --- |
-| 7.36 s of English speech | 1.70 s to 1.86 s over three runs | about 4x faster than real time |
+| Model | Profile | Wall time | Ratio | Peak memory |
+| --- | --- | --- | --- | --- |
+| `whisper-tiny-q5_1` | light | 47.6 s | 17x real time | 732 MB |
+| `whisper-base-q5_1` | light, forced | 69.8 s | 12x real time | 789 MB |
+| `whisper-small-q5_1` | balanced | 200.4 s | 4.1x real time | 1055 MB |
 
-That is a single short sample, measured with a release build, including the FFmpeg process and its start-up cost. It is not a benchmark suite and not a promise for longer media. Reproducible benchmark scripts and a wider hardware matrix are on the roadmap. See [docs/benchmarks.md](docs/benchmarks.md).
+All three runs finished and wrote cues across the whole file. The speech was synthesised, single voice and clean, so real recordings will be harder. Accuracy has not been measured. This is one machine, not a benchmark suite; the method and limits are in [docs/benchmarks.md](docs/benchmarks.md).
 
 ## Privacy
 
