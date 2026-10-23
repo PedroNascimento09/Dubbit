@@ -1,0 +1,10 @@
+version = 1
+SPDX-PackageName = "Dubbit"
+SPDX-PackageSupplier = "Pedro Nascimento"
+SPDX-PackageDownloadLocation = "https://github.com/PedroNascimento09/Dubbit"
+
+[[annotations]]
+path = ["**"]
+precedence = "aggregate"
+SPDX-FileCopyrightText = "2026 Pedro Nascimento"
+SPDX-License-Identifier = "Apache-2.0"
