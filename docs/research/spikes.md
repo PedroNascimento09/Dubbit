@@ -37,8 +37,9 @@ memory stayed far below the cap, so the cap proves headroom, not the behaviour
 of an out-of-memory failure. Results and commands are in
 [benchmarks](../benchmarks.md).
 
-Residual limits: synthesised single-voice speech, no word error rate, no
-translation stage, one machine, no Linux or macOS run.
+Residual limits: synthesised single-voice speech, no translation stage, one
+machine, no Linux or macOS run. Accuracy is measured separately in
+[benchmarks](../benchmarks.md), Measurement 3.
 
 ## S4 Translation quality
 
