@@ -1,0 +1,93 @@
+name: Hardware report
+description: Report a run on a machine that is not in the compatibility matrix.
+title: "[Hardware]: "
+labels: ["hardware"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Use this form to add a machine to the compatibility matrix. Paste the
+        hardware summary from `dubbit doctor`, not a screenshot.
+  - type: input
+    id: version
+    attributes:
+      label: Dubbit version
+      description: The output of `dubbit --version`.
+    validations:
+      required: true
+  - type: dropdown
+    id: operating-system
+    attributes:
+      label: Operating system
+      options:
+        - Windows
+        - Linux
+        - macOS
+    validations:
+      required: true
+  - type: input
+    id: processor
+    attributes:
+      label: Processor
+      description: Model and core count.
+    validations:
+      required: true
+  - type: input
+    id: memory
+    attributes:
+      label: Memory
+      description: Installed RAM in gigabytes.
+    validations:
+      required: true
+  - type: input
+    id: graphics
+    attributes:
+      label: Graphics adapter
+      description: What `dubbit doctor` reports, including adapters that are detected but unused.
+  - type: dropdown
+    id: profile
+    attributes:
+      label: Profile
+      options:
+        - auto
+        - light
+        - balanced
+        - max
+    validations:
+      required: true
+  - type: input
+    id: model
+    attributes:
+      label: Model
+      description: The model id shown by `dubbit models list`.
+    validations:
+      required: true
+  - type: input
+    id: duration
+    attributes:
+      label: Media duration
+      description: How long the input was, and roughly what it contained.
+    validations:
+      required: true
+  - type: input
+    id: timing
+    attributes:
+      label: Wall time
+      description: How long the command took, measured with time or a stopwatch.
+    validations:
+      required: true
+  - type: textarea
+    id: report
+    attributes:
+      label: Diagnostic report
+      description: Run `dubbit doctor --report report.json`, read it, remove personal paths, then paste it.
+      render: json
+  - type: checkboxes
+    id: confirmation
+    attributes:
+      label: Confirmation
+      options:
+        - label: The run finished on this machine, or the failure is described above.
+          required: true
+        - label: The report contains no private media, paths or credentials.
+          required: true
