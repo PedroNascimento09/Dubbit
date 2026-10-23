@@ -17,6 +17,7 @@ All notable changes to this project are documented here. The format follows Keep
 - Glossary support with case-insensitive matching, longest term first, and protection across translation.
 - Diagnostic report written by `dubbit doctor --report`, without media, transcripts or personal paths.
 - Typed error catalogue with stable codes, a human title, a detail and a next step, plus JSON error output.
+- Benchmark tooling: a deterministic corpus builder and a word error rate scorer, with published results for three models.
 
 ### Changed
 
