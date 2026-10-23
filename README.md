@@ -107,7 +107,17 @@ Measured by the author on Windows 11, 12 logical cores, 15 GB of RAM, no graphic
 | `whisper-base-q5_1` | light, forced | 69.8 s | 12x real time | 789 MB |
 | `whisper-small-q5_1` | balanced | 200.4 s | 4.1x real time | 1055 MB |
 
-All three runs finished and wrote cues across the whole file. The speech was synthesised, single voice and clean, so real recordings will be harder. Accuracy has not been measured. This is one machine, not a benchmark suite; the method and limits are in [docs/benchmarks.md](docs/benchmarks.md).
+All three runs finished and wrote cues across the whole file. The speech was synthesised, single voice and clean, so real recordings will be harder. This is one machine, not a benchmark suite; the method and limits are in [docs/benchmarks.md](docs/benchmarks.md).
+
+Accuracy on 155 clips of the public LibriSpeech `test-clean` corpus (23 min 45 s, CC BY 4.0), scored with word error rate:
+
+| Model | WER |
+| --- | --- |
+| `whisper-tiny-q5_1` | 8.22% |
+| `whisper-base-q5_1` | 5.25% |
+| `whisper-small-q5_1` | 4.52% |
+
+English only, clean read speech, greedy decoding. Other languages, noise and translation quality are still unmeasured.
 
 ## Privacy
 
