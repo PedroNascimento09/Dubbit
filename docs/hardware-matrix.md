@@ -26,8 +26,8 @@ Every row uses one of these words, and nothing else:
 
 | Profile | Target hardware | Model | State |
 | --- | --- | --- | --- |
-| light | 8 GB of RAM, no useful graphics adapter | `whisper-tiny-q5_1` | Verified, author machine |
-| balanced | 16 GB of RAM or a recent Apple Silicon Mac | `whisper-small-q5_1` | Implemented, not verified |
+| light | 8 GB of RAM, no useful graphics adapter | `whisper-tiny-q5_1` | Verified, author machine: 13.6 min file in 47.6 s with a hard 8 GiB cap, peak 732 MB |
+| balanced | 16 GB of RAM or a recent Apple Silicon Mac | `whisper-small-q5_1` | Verified, author machine: same file in 200.4 s, peak 1055 MB, under the same 8 GiB cap |
 | max | 32 GB of RAM or a discrete graphics adapter with 12 GB | `whisper-large-v3-turbo-q5_0` | Implemented, not verified |
 | auto | Detected from memory, cores and adapters | Chosen per machine | Verified, author machine |
 
