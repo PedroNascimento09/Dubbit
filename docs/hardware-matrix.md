@@ -60,9 +60,10 @@ chose. Detection is information, not a claim of acceleration.
 ## Languages
 
 All 65 codes listed by `dubbit languages` can be transcribed and used as a
-target. Quality differs by language and model, and no language has a measured
-quality grade yet. Treat every pair as unproven until the benchmark work in the
-roadmap is done.
+target. English transcription has a measured word error rate on a public clean
+corpus (8.22%, 5.25% and 4.52% for tiny, base and small), documented in
+[benchmarks](benchmarks.md). No other language and no translation pair has a
+measured quality grade yet, so treat them as unproven.
 
 ## What would change a row
 
