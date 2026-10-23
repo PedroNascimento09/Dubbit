@@ -21,12 +21,24 @@ and subtitles a sample file offline, on Windows and on Linux.
 Question: does the light profile finish a longer file on a machine limited to
 8 GB, with no graphics acceleration?
 
-State: partly measured. A 7.36 s clip transcribed in about 1.0 s wall time with
-`whisper-tiny-q5_1` on a 12-core Windows machine, using the CPU path. Memory was
-not artificially capped, the file was short, and accuracy was not measured.
+State: closed for the transcription path. Three runs on 2026-10-23, release
+build, Windows 11, 12 logical cores, 15 GB of RAM, a 13 min 37 s (817 s)
+synthesised speech file, inside a Windows job object that caps the process and
+the job at 8 GiB, including the recognition child process:
 
-What closes it: a ten minute file, a hard 8 GB memory limit, peak memory
-recorded, and the result published in [benchmarks](../benchmarks.md).
+| Model | Profile | Wall time | Ratio | Peak job memory |
+| --- | --- | --- | --- | --- |
+| `whisper-tiny-q5_1` | light | 47.64 s | 17.2x | 731.5 MB |
+| `whisper-base-q5_1` | light, forced | 69.79 s | 11.7x | 789.2 MB |
+| `whisper-small-q5_1` | balanced | 200.44 s | 4.1x | 1055.0 MB |
+
+All runs exited 0 and produced 223 to 224 cues covering the whole file. Peak
+memory stayed far below the cap, so the cap proves headroom, not the behaviour
+of an out-of-memory failure. Results and commands are in
+[benchmarks](../benchmarks.md).
+
+Residual limits: synthesised single-voice speech, no word error rate, no
+translation stage, one machine, no Linux or macOS run.
 
 ## S4 Translation quality
 
