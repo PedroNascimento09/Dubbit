@@ -68,19 +68,53 @@ system and a browser running, but it does not exercise an out-of-memory path.
 
 - The speech was synthesised from one voice, with no music, noise, crosstalk or
   accent variation. Real media is harder for the recogniser and for timing.
-- Accuracy was not measured. There is no word error rate yet.
+- Accuracy is in Measurement 3, not in this timing run.
 - One machine, one operating system. Linux, macOS and smaller processors are
   unmeasured.
 - Ratio falls quickly with model size. A 13 minute file on the small model still
   takes over three minutes, so long recordings need the light or base model on
   modest hardware.
 
+## Measurement 3: word error rate
+
+| Field | Value |
+| --- | --- |
+| Date | 2026-10-23 |
+| Corpus | LibriSpeech `test-clean`, CC BY 4.0, sampled deterministically: 16 chapters, first 10 utterances of each, 155 clips |
+| Reference | 3429 normalised words |
+| Audio | 1425.07 s (23 min 45 s), 16 kHz mono, 0.35 s of silence between clips |
+| System | Windows 11, 12 logical cores, 15 GB of RAM |
+| Build | release, memory capped at 8 GiB |
+| Language | English, forced with `--from en` |
+| Decoding | greedy, the recogniser default |
+
+| Model | Profile | WER | Errors | Substitutions | Deletions | Insertions |
+| --- | --- | --- | --- | --- | --- | --- |
+| `whisper-tiny-q5_1` | light | 8.22% | 282 | 242 | 17 | 23 |
+| `whisper-base-q5_1` | light, model forced | 5.25% | 180 | 154 | 21 | 5 |
+| `whisper-small-q5_1` | balanced | 4.52% | 155 | 128 | 20 | 7 |
+
+The ordering is the expected one: each larger model is more accurate. The tool
+that produced these numbers is in [benchmarks/](../benchmarks/README.md), with
+the corpus build and the exact commands.
+
+### What this measurement does not say
+
+- Only English, only clean read speech from the public corpus. Accents, noise,
+  music and crosstalk are untested.
+- Punctuation and casing are normalised away by the scorer. Spoken numbers must
+  still match the reference words.
+- Scores are on a concatenated stream of separate clips, not a real recording
+  with natural turn taking.
+- No other model family, no other decoding setting, and no translated output was
+  scored. Translation quality remains unmeasured.
+
 ## Planned measurements
 
-The roadmap calls for a wider suite: several clip lengths, noisy and
-multi-speaker audio, all four models, every profile, and a word error rate
-against a public test set. Results will be added here with the raw numbers and
-the exact commands, and previous entries will be kept rather than edited.
+The roadmap calls for a wider suite: noisy and multi-speaker audio, other
+languages, a translation quality metric per language pair, and the largest
+model. Results will be added here with the raw numbers and the exact commands,
+and previous entries will be kept rather than edited.
 
 ## Rules
 
