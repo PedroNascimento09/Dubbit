@@ -1,0 +1,12 @@
+Dubbit
+Copyright 2026 Pedro Nascimento
+
+This product is licensed under the Apache License, Version 2.0. A copy of the
+licence is in the LICENSE file.
+
+Dubbit invokes third-party programs and downloads third-party model weights
+that are not part of this repository. Their attribution and licence terms are
+recorded in THIRD_PARTY_NOTICES.md and MODEL_LICENSES.md.
+
+The name Dubbit, the logo and the mascot are not licensed under the Apache
+License, Version 2.0. See TRADEMARKS.md.
