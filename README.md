@@ -103,9 +103,9 @@ One measurement, made by the author on Windows 11, 12 cores, 15 GB of RAM, no us
 
 | Audio | Wall time | Ratio |
 | --- | --- | --- |
-| 7.36 s of English speech | about 1.0 s | about 7x faster than real time |
+| 7.36 s of English speech | 1.70 s to 1.86 s over three runs | about 4x faster than real time |
 
-That is a single short sample, not a benchmark suite, and it is not a promise for longer media. Reproducible benchmark scripts and a wider hardware matrix are on the roadmap. See [docs/benchmarks.md](docs/benchmarks.md).
+That is a single short sample, measured with a release build, including the FFmpeg process and its start-up cost. It is not a benchmark suite and not a promise for longer media. Reproducible benchmark scripts and a wider hardware matrix are on the roadmap. See [docs/benchmarks.md](docs/benchmarks.md).
 
 ## Privacy
 
