@@ -1,0 +1,19 @@
+cff-version: 1.2.0
+message: "If you use Dubbit in academic work, cite it with the metadata below."
+type: software
+title: Dubbit
+abstract: "Local subtitling for video and audio, with speech recognition and translation running on the user's machine."
+authors:
+  - family-names: Nascimento
+    given-names: Pedro
+    alias: PedroNascimento09
+repository-code: "https://github.com/PedroNascimento09/Dubbit"
+url: "https://github.com/PedroNascimento09/Dubbit"
+license: Apache-2.0
+version: 0.1.0
+date-released: 2026-10-23
+keywords:
+  - subtitles
+  - speech recognition
+  - translation
+  - offline
