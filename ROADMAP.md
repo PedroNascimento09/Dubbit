@@ -16,8 +16,8 @@ Dubbit ships in small milestones, each one usable and tested before the next sta
 
 ## Known gaps
 
-- No installers yet. The current build is run from source.
-- The desktop window is a development preview: the queue, the review editor and the save path work, but it is not yet installed by a package.
+- A Windows installer exists and bundles the media tools, but it has been installed on one machine only, never on a clean virtual machine. There is no Linux installer yet and no public release.
+- The desktop window is a development preview: the queue, the review editor and the save path work.
 - macOS is untested. Only Windows and Linux are on the tested path.
 - FFmpeg and the speech recognition executable are supplied by the user; they are not bundled yet.
 - One model family covers recognition, with four sizes and no alternative engines.
