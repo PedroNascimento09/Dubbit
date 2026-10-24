@@ -2,7 +2,6 @@ import { convertFileSrc, invoke } from "@tauri-apps/api/core";
 import { listen } from "@tauri-apps/api/event";
 import { getCurrentWebview } from "@tauri-apps/api/webview";
 import { open } from "@tauri-apps/plugin-dialog";
-import { revealItemInDir } from "@tauri-apps/plugin-opener";
 
 import { demoEnvironment, demoFiles, demoJobs, demoMedia, demoProject, isDemo } from "./demo";
 import type { Environment, Job, Media, NewJob, Project, Segment } from "./types";
@@ -206,7 +205,7 @@ export const desktop = {
 
   async reveal(path: string): Promise<void> {
     if (isDemo()) return;
-    await revealItemInDir(path);
+    await invoke<void>("reveal", { path });
   },
 
   audioUrl(path: string | null): string | null {
