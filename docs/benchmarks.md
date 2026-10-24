@@ -140,6 +140,17 @@ strongest. Every direction costs 0.05 to 0.33 seconds per sentence, two to
 three orders of magnitude below the transcription stage, so translation is not
 a bottleneck.
 
+What it costs to have a pair ready, measured with `benchmarks/translation_cost.py`:
+
+| Pair | Weights on disk | Memory added | To first line | Per line |
+| --- | --- | --- | --- | --- |
+| en → pt | 83 MB | 350 MB | 3.99 s | 0.079 s |
+| en → de | 165 MB | 426 MB | 3.56 s | 0.092 s |
+
+The load dominates the first line; afterwards a line costs nothing worth
+counting. The decision that follows from these numbers is recorded in
+[ADR 0008](../adr/0008-translation-runtime.md).
+
 The commands:
 
 ```sh
