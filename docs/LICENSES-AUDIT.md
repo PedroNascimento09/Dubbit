@@ -1,7 +1,7 @@
 # Licence audit
 
 This audit decides what Dubbit may link, what it may run as a separate program,
-and what it may not ship. It was last verified on 2026-10-23 by reading the
+and what it may not ship. It was last verified on 2026-10-24 by reading the
 licence metadata of every crate in `Cargo.lock` and the licence files of the
 separate programs. It is an engineering record, not legal advice.
 
@@ -22,8 +22,8 @@ separate programs. It is an engineering record, not legal advice.
 | Component | Version | Licence | Commercial use | Distributed by Dubbit | Decision |
 | --- | --- | --- | --- | --- | --- |
 | Rust standard library and crates in `Cargo.lock` | current | MIT, Apache-2.0, ISC, BSD-3-Clause, Unicode-3.0, CDLA-Permissive-2.0, Unlicense | Yes | Linked into the binary | Accepted |
-| FFmpeg and FFprobe | external build | LGPL-2.1-or-later, or GPL-2.0-or-later for some builds | Yes, with conditions | No, supplied by the user today | Accepted as a separate program; release builds must use an LGPL build |
-| whisper.cpp `whisper-cli` | external build | MIT | Yes | No, supplied by the user today | Accepted as a separate program |
+| FFmpeg and FFprobe | N-127957-g935f29eaae, LGPL build | LGPL-3.0-or-later | Yes, with conditions | Yes, separate executable in the installer and portable package | Accepted. A GPL build must never be bundled; `models/tools.json` pins the LGPL archive and the licence text ships in `resources/licenses/` |
+| whisper.cpp `whisper-cli` | 1.9.5, build b5454 | MIT | Yes | Yes, separate executable in the installer and portable package | Accepted, with its MIT text bundled |
 | Whisper quantised weights | as listed in the manifest | MIT | Yes | No, downloaded on request | Accepted |
 | Rustls, ring, webpki-roots | current | Apache-2.0, ISC, MIT, CDLA-Permissive-2.0 | Yes | Linked | Accepted |
 
@@ -68,4 +68,8 @@ AGPL code remains excluded, and no GPL or AGPL binary is linked.
   reason in `deny.toml`.
 - The model manifest is reviewed by hand when a model is added; a checksum or
   licence mismatch fails the review.
+- The tool manifest works the same way: every entry pins a URL, a byte size, a
+  SHA-256 and a licence, and `scripts/bundle-tools.py` refuses to stage anything
+  that does not match. The LGPL source for the bundled FFmpeg build stays
+  available at the pinned tag named in its licence folder.
 - Release notes record any licence change and the date it was verified.
