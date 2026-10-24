@@ -4,13 +4,28 @@ mod commands;
 mod queue;
 mod view;
 
+use std::path::PathBuf;
+
 use tauri::Manager;
+
+fn bundled_tools(app: &tauri::App) -> Option<PathBuf> {
+    let root = app.path().resource_dir().ok()?;
+    [root.join("bin"), root.join("resources").join("bin")]
+        .into_iter()
+        .find(|candidate| {
+            candidate.join("ffmpeg.exe").is_file() || candidate.join("ffmpeg").is_file()
+        })
+}
 
 fn main() {
     tauri::Builder::default()
         .plugin(tauri_plugin_dialog::init())
-        .plugin(tauri_plugin_opener::init())
         .setup(|app| {
+            if std::env::var_os("DUBBIT_TOOLS_DIR").is_none() {
+                if let Some(tools) = bundled_tools(app) {
+                    std::env::set_var("DUBBIT_TOOLS_DIR", tools);
+                }
+            }
             let queue = queue::Queue::start(app.handle().clone());
             app.manage(queue);
             Ok(())
@@ -24,6 +39,7 @@ fn main() {
             commands::open_project,
             commands::save_review,
             commands::install_model,
+            commands::reveal,
             commands::data_dir
         ])
         .run(tauri::generate_context!())
