@@ -64,10 +64,12 @@ What closes it: a written review by a speaker per launch pair, numbers for the
 remaining pairs, and a decision on whether the product ships these weights
 in-process or keeps the existing server and command backends.
 
-Residual risk: the measurement ran the model directly, not through the product.
-The shipped path for a local translator command takes no arguments, so a Python
-script needs an executable wrapper on Windows; scripting the product against
-these weights is still to be done.
+Through the product: the scores come from running the model directly, but the
+shipped translation stage was exercised once end to end. `benchmarks/ollama_shim.py`
+answers the local server protocol with the same engine, and a real run of
+`dubbit dub clip.mp4 --from en --to pt --translator ollama` produced translated
+SRT and VTT files. The command backend still takes no arguments, so a Python
+script needs an executable wrapper on Windows; that path remains unexercised.
 
 ## S7 Voice synthesis in Rust
 
