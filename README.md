@@ -60,7 +60,7 @@ interview.dubbit/
 To use the window instead of the command line, with FFmpeg, FFprobe and the speech recogniser bundled into an installer:
 
 ```sh
-bash scripts/bundle-tools.sh
+python scripts/bundle-tools.py
 cd apps/desktop
 npm install
 npm run tauri build
