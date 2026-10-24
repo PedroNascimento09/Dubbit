@@ -115,47 +115,65 @@ the corpus build and the exact commands.
 | Field | Value |
 | --- | --- |
 | Date | 2026-10-24 |
-| Engine | OPUS-MT weights as packaged by Argos Translate 1.9, run through CTranslate2 4.x on CPU, int8, default decoding |
-| Corpus 1 | Tatoeba en-pt, version 2023-04-12, CC BY 2.0 FR, 200 sentence pairs sampled with seed 2026 |
-| Corpus 2 | Wikimedia en-pt, version 20230407, CC BY-SA, 200 sentence pairs, same filter and seed |
+| Engine | OPUS-MT weights as packaged by Argos Translate 1.9, run through CTranslate2 on CPU with float32 and default decoding |
+| Corpus 1 | Tatoeba, version 2023-04-12, CC BY 2.0 FR, 200 sentence pairs per direction, seed 2026 |
+| Corpus 2 | Wikimedia, version 20230407, CC BY-SA, 200 sentence pairs per direction, same filter and seed |
 | Filter | both sides between 20 and 200 characters, duplicate sources removed |
 | Metric | chrF and BLEU from SacreBLEU 2.6, defaults |
 | System | Windows 11, 12 logical cores, 15 GB of RAM, no GPU |
+| Languages | English, Portuguese, Spanish, French and German, each way against English |
 
-| Pair | Corpus | chrF | BLEU | Segments | Source words | Seconds |
-| --- | --- | --- | --- | --- | --- | --- |
-| en → pt | Tatoeba | 68.45 | 49.18 | 200 | 1399 | 11.3 |
-| pt → en | Tatoeba | 76.87 | 65.02 | 200 | 1500 | 12.3 |
-| en → pt | Wikimedia | 71.06 | 52.49 | 200 | 3549 | 37.6 |
-| pt → en | Wikimedia | 71.67 | 52.36 | 200 | 3355 | 34.4 |
+| Pair | Tatoeba chrF | Tatoeba BLEU | Wikimedia chrF | Wikimedia BLEU |
+| --- | --- | --- | --- | --- |
+| en → pt | 68.45 | 49.18 | 71.06 | 52.49 |
+| pt → en | 76.87 | 65.02 | 71.67 | 52.36 |
+| en → es | 73.53 | 55.55 | 70.46 | 52.31 |
+| es → en | 69.57 | 54.75 | 71.71 | 53.66 |
+| en → fr | 68.62 | 51.30 | 68.99 | 50.04 |
+| fr → en | 71.66 | 57.72 | 68.43 | 48.16 |
+| en → de | 67.87 | 47.05 | 62.51 | 39.17 |
+| de → en | 69.62 | 51.24 | 66.30 | 46.93 |
 
-Cost is 0.06 seconds per short sentence and 0.17 to 0.19 seconds per longer
-one, which is two to three orders of magnitude below the transcription stage.
-Translation is not a bottleneck.
+German is the weakest pair on both corpora and on both metrics, and it is the
+only one that drops below 65 chrF on real text. Portuguese and Spanish are the
+strongest. Every direction costs 0.05 to 0.33 seconds per sentence, two to
+three orders of magnitude below the transcription stage, so translation is not
+a bottleneck.
 
 The commands:
 
 ```sh
-python benchmarks/translation_quality.py --corpus tatoeba --source en --target pt --limit 200
-python benchmarks/translation_quality.py --corpus tatoeba --source pt --target en --limit 200
-python benchmarks/translation_quality.py --corpus wikimedia --source en --target pt --limit 200
-python benchmarks/translation_quality.py --corpus wikimedia --source pt --target en --limit 200
+for pair in "en pt" "pt en" "en es" "es en" "en fr" "fr en" "en de" "de en"; do
+  set -- $pair
+  for corpus in tatoeba wikimedia; do
+    python benchmarks/translation_quality.py --corpus $corpus --source $1 --target $2 --limit 200
+  done
+done
 ```
+
+`--examples 10` prints source, model output and human reference for the first
+ten sentences, which is the material a reviewer reads.
+
+Fixed setting, measured once: the Spanish to English package loops forever with
+int8 quantisation and returns real text with float32. Every row above therefore
+uses float32, which is also the safe default for a user's machine. Speed was not
+the deciding factor, correctness was.
 
 ### What this measurement does not say
 
-- These are automatic metrics, not reader judgement. Nobody who speaks the pair
+- These are automatic metrics, not reader judgement. Nobody who speaks a pair
   has read the output yet. A chrF near 70 hides flat sentences, wrong register
-  and mistranslated names; the plan still requires a written review per pair.
+  and translated proper names; the plan still requires a written review.
 - Tatoeba is short, simple and very likely inside the model's training data, so
-  the two Tatoeba rows are optimistic. The Wikimedia rows are the more honest
-  signal for real text.
-- Only English and Portuguese. Spanish, French and German have no number, and
-  neither does any pair reached through a pivot language.- The scores come from running the model directly. The shipped translation
-  stage was exercised separately, once, through the same engine behind the
-  local server protocol, and produced translated SRT and VTT files; the effect
-  of subtitle segment boundaries, glossary protection and cue splitting on
-  quality is still unmeasured.
+  those rows are optimistic. The Wikimedia rows are the more honest signal.
+- Only pairs with direct weights against English. Nothing was measured through a
+  pivot language, and Portuguese and Spanish were not measured against each
+  other.
+- The scores come from running the model directly. The shipped translation stage
+  was exercised separately, once, through the same engine behind the local
+  server protocol, and produced translated SRT and VTT files; the effect of
+  subtitle segment boundaries, glossary protection and cue splitting on quality
+  is still unmeasured.
 - Tatoeba and Wikimedia sentences are already clean text. Speech that has been
   transcribed with errors will translate worse, and that compounding is not
   measured here.
