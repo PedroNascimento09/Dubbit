@@ -40,6 +40,7 @@ Every change must pass all three from the repository root:
 cargo fmt --all -- --check
 cargo clippy --workspace --all-targets -- -D warnings
 cargo test --workspace
+cargo deny check
 ```
 
 Tests run offline. A test that needs a model, FFmpeg or a media sample must be marked ignored and documented next to the test.
@@ -83,15 +84,24 @@ DUBBIT_TOOLS_DIR=/path/to/tools cargo run -p dubbit-desktop
 
 A debug build loads the interface from `http://127.0.0.1:5173`, so the dev server must be up.
 
-A release build embeds the built interface and needs nothing at runtime except the tools and the model:
+A release build embeds the built interface and the media tools:
 
 ```sh
+bash scripts/bundle-tools.sh
 cd apps/desktop
-npm run tauri build -- --no-bundle
-./target/release/dubbit-desktop
+npm run tauri build
 ```
 
-`npm run tauri build` without `--no-bundle` also produces the installer. Building the crate with plain `cargo build --release` is not enough: the binary keeps pointing at the dev server.
+That writes the installer and the bundled binary. `npm run tauri build -- --no-bundle` skips the installer. The tools are copied from `.tools/bin` and `.tools/whisper/bin/Release` unless `DUBBIT_TOOLS_DIR` and `DUBBIT_WHISPER_DIR` say otherwise; they are not committed to the repository.
+
+Building the crate with plain `cargo build --release` is not enough: the binary keeps pointing at the dev server and expects the tools on `PATH`.
+
+Release artefacts get a SHA-256 side file and a bill of materials:
+
+```sh
+python scripts/checksums.py target/release/bundle/nsis/*.exe
+python scripts/sbom.py target/dubbit-sbom.cdx.json
+```
 
 ## Project folder
 
