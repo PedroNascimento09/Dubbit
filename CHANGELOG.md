@@ -22,7 +22,7 @@ All notable changes to this project are documented here. The format follows Keep
 - Release workflow builds the Windows installer, a portable Windows package, a Linux `.deb` and AppImage, the command line archives, one checksum file and the bill of materials, and publishes them together.
 - Translation quality benchmark: `benchmarks/translation_quality.py` samples a parallel corpus deterministically, translates it with the local model and prints chrF, BLEU and cost per segment, with a line translator that can serve as the command backend.
 - `benchmarks/ollama_shim.py` answers the local model server protocol with the same engine, so the shipped translation stage can be exercised end to end on a machine with no model server installed.
-- First published translation numbers for English and Portuguese on Tatoeba and Wikimedia, with method and limits in the benchmarks page.
+- First published translation numbers for English, Portuguese, Spanish, French and German against English on Tatoeba and Wikimedia, with method, commands and limits in the benchmarks page.
 - Test that the command line works from a data folder with accents and spaces, and an ignored end-to-end test that subtitles a real media file when the tools are present.
 
 ### Changed
