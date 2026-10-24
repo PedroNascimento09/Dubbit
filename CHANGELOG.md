@@ -14,6 +14,16 @@ All notable changes to this project are documented here. The format follows Keep
 - Light and dark appearance, remembered between launches, and reduced motion when the system asks for it.
 - Recovery screen for an unexpected interface failure, and a deterministic preview mode for interface work.
 - `pipeline::save_review` and `pipeline::write_subtitles` as the shared path for writing subtitles from edited lines.
+- Windows installer that bundles FFmpeg, FFprobe and the speech recogniser, installs for the current user, and needs no environment variables.
+- Bundled tools are found from the application resource folder, so an installed window runs without any setup.
+- `scripts/bundle-tools.sh` stages the media tools for the installer, `scripts/checksums.py` writes SHA-256 side files, and `scripts/sbom.py` writes a CycloneDX bill of materials from the Cargo graph.
+- Test that the command line works from a data folder with accents and spaces, and an ignored end-to-end test that subtitles a real media file when the tools are present.
+
+### Changed
+
+- HTTP downloads use the current client release, which drops an unmaintained PEM parsing dependency. Resumed downloads and checksum verification were measured again after the change.
+- Revealing a finished project is handled by the desktop backend instead of a plugin, removing a Linux dependency chain that carried unmaintained advisories.
+- Path dependencies inside the workspace carry an explicit version, so dependency checks no longer report them as wildcards.
 
 ## 0.1.0 - 2026-10-23
 
