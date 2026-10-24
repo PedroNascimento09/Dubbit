@@ -25,6 +25,7 @@ All notable changes to this project are documented here. The format follows Keep
 - `benchmarks/translation_cost.py` measures that cost for any pair.
 - `benchmarks/ollama_shim.py` answers the local model server protocol with the same engine, so the shipped translation stage can be exercised end to end on a machine with no model server installed.
 - First published translation numbers for English, Portuguese, Spanish, French and German against English on Tatoeba and Wikimedia, with method, commands and limits in the benchmarks page.
+- Cue timing never runs past its own segment, keeps a one second floor when the segment allows it, and lends spare time to cues that are dense for their length. `benchmarks/cue_speed.py` reports characters per second per subtitle file.
 - Test that the command line works from a data folder with accents and spaces, and an ignored end-to-end test that subtitles a real media file when the tools are present.
 
 ### Changed
