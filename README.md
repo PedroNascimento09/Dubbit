@@ -1,10 +1,12 @@
+<p align="center"><img src="assets/logo.svg" width="72" height="72" alt="Dubbit"></p>
+
 # Dubbit
 
 **Subtitles and translations for your videos, on your computer.**
 
 Dubbit reads a video or audio file, transcribes the speech, translates it, and writes subtitle files. Everything runs on your machine: no accounts, no uploads, no telemetry, and no network while it works.
 
-This is an early build. It is a command line tool, built from source, and its promise today is subtitles only. Dubbing is on the roadmap, not in the build.
+This is an early build, run from source, and its promise today is subtitles only. Dubbing is on the roadmap, not in the build.
 
 ## What works today
 
@@ -17,9 +19,14 @@ This is an early build. It is a command line tool, built from source, and its pr
 - Read errors as a code, a plain title, a reason and a next step.
 - Export a diagnostic report with one command.
 
+## Two ways to use it
+
+- **Desktop window.** Drop a file, pick a language, watch the stages, fix any line in the review editor and export. The queue survives a restart, and every run keeps its checkpoint.
+- **Command line.** The same engine for scripts, servers and batch work.
+
 ## What is not here yet
 
-- No installers and no desktop window. You build the binary with Cargo.
+- No installers. The window and the binary are built from source for now.
 - No dubbing, voice synthesis or lip sync.
 - macOS has not been tested. Windows and Linux are the supported targets.
 - FFmpeg and the speech recognition executable are supplied by you, not bundled yet.
@@ -49,6 +56,18 @@ interview.dubbit/
   subtitles/pt.srt
   subtitles/pt.vtt
 ```
+
+To use the window instead of the command line:
+
+```sh
+cd apps/desktop
+npm install
+npm run build
+cargo build -p dubbit-desktop
+./target/debug/dubbit-desktop
+```
+
+The window is documented in [docs/gui.md](docs/gui.md). It needs the same tools as the command line.
 
 ## Commands
 
