@@ -62,9 +62,8 @@ To use the window instead of the command line:
 ```sh
 cd apps/desktop
 npm install
-npm run build
-cargo build -p dubbit-desktop
-./target/debug/dubbit-desktop
+npm run tauri build -- --no-bundle
+./target/release/dubbit-desktop
 ```
 
 The window is documented in [docs/gui.md](docs/gui.md). It needs the same tools as the command line.
