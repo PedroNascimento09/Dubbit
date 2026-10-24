@@ -41,13 +41,14 @@ impl Ollama {
     }
 
     pub fn probe(&self) -> bool {
-        let agent = ureq::AgentBuilder::new()
-            .timeout(Duration::from_millis(700))
-            .build();
+        let agent: ureq::Agent = ureq::Agent::config_builder()
+            .timeout_global(Some(Duration::from_millis(700)))
+            .build()
+            .into();
         agent
             .get(&format!("{}/api/tags", self.host))
             .call()
-            .map(|response| response.status() == 200)
+            .map(|response| response.status().as_u16() == 200)
             .unwrap_or(false)
     }
 
@@ -74,25 +75,27 @@ impl Translator for Ollama {
             "options": { "temperature": 0.2 },
         })
         .to_string();
-        let agent = ureq::AgentBuilder::new()
-            .timeout(Duration::from_secs(120))
-            .build();
-        let response = agent
+        let agent: ureq::Agent = ureq::Agent::config_builder()
+            .timeout_global(Some(Duration::from_secs(120)))
+            .build()
+            .into();
+        let mut response = agent
             .post(&format!("{}/api/generate", self.host))
-            .set("Content-Type", "application/json")
-            .send_string(&body)
+            .header("Content-Type", "application/json")
+            .send(&body)
             .map_err(|error| match error {
-                ureq::Error::Status(_, _) => engine_failed(
+                ureq::Error::StatusCode(_) => engine_failed(
                     "ollama",
                     "the server refused the request; confirm the model is pulled",
                 ),
-                ureq::Error::Transport(_) => engine_missing(
+                _ => engine_missing(
                     "ollama",
                     format!("no model server answered on {}", self.host),
                 ),
             })?;
         let value: serde_json::Value = response
-            .into_json()
+            .body_mut()
+            .read_json()
             .map_err(|error| engine_failed("ollama", error.to_string()))?;
         let answer = value
             .get("response")
