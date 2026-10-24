@@ -13,7 +13,7 @@ name = "dubbit"
 path = "src/main.rs"
 
 [dependencies]
-dubbit-core = { path = "../../core" }
+dubbit-core = { path = "../../core", version = "0.1.0" }
 clap.workspace = true
 serde_json.workspace = true
 
