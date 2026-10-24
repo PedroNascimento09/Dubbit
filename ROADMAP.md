@@ -16,7 +16,7 @@ Dubbit ships in small milestones, each one usable and tested before the next sta
 
 ## Known gaps
 
-- A Windows installer exists and bundles the media tools, but it has been installed on one machine only, never on a clean virtual machine. There is no Linux installer yet and no public release.
+- A Windows installer and a portable Windows package exist and bundle the media tools at pinned, verified versions, but they have been installed on one machine only, never on a clean virtual machine. The Linux build is defined in the release workflow and has not run yet. There is no public release.
 - The desktop window is a development preview: the queue, the review editor and the save path work.
 - macOS is untested. Only Windows and Linux are on the tested path.
 - FFmpeg and the speech recognition executable are supplied by the user; they are not bundled yet.
