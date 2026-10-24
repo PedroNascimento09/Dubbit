@@ -13,6 +13,7 @@ corpus exists.
 | `translation_quality.py` | Samples a parallel corpus, translates every source sentence with the local model, and prints chrF, BLEU, segment count and time per segment |
 | `argos_engine.py` | Loads the installed translation model through CTranslate2 and returns a function that translates one sentence |
 | `argos_line.py` | Reads one line on standard input and writes the translation on standard output, so it can serve as the product's command backend on Linux and macOS |
+| `translation_cost.py` | Loads one translation package, measures the memory it adds, the time to the first line and the steady cost per line, and reports the weights on disk |
 | `ollama_shim.py` | Speaks the local model server protocol on a loopback port and answers with the same engine, so the product's own translation stage can be exercised with a real model |
 
 ## Corpus
