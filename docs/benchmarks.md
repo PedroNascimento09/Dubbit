@@ -99,6 +99,19 @@ The ordering is the expected one: each larger model is more accurate. The tool
 that produced these numbers is in [benchmarks/](../benchmarks/README.md), with
 the corpus build and the exact commands.
 
+### Noisy baseline
+
+The same corpus with white noise mixed in at a fixed level (`anoisesrc`,
+amplitude 0.03, mixed and renormalised) degrades by a measurable amount, which
+gives the ceiling any enhancement has to beat:
+
+| Model | Clean WER | Noisy WER | Errors added |
+| --- | --- | --- | --- |
+| `whisper-tiny-q5_1` | 8.22% | 10.79% | 370 against 242, so 128 more |
+
+The noise is synthetic and constant, not a room recording, so the number says
+how much room there is, not what a real café does to recognition.
+
 ### What this measurement does not say
 
 - Only English, only clean read speech from the public corpus. Accents, noise,
