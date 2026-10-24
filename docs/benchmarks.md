@@ -189,6 +189,32 @@ the deciding factor, correctness was.
   transcribed with errors will translate worse, and that compounding is not
   measured here.
 
+## Measurement 5: cue readability
+
+| Field | Value |
+| --- | --- |
+| Date | 2026-10-24 |
+| Media | 9.92 s clip, English speech, `whisper-tiny-q5_1` |
+| Tool | `benchmarks/cue_speed.py` |
+| Cues | 3 |
+| Characters | 159 over 9.9 s |
+| Median | 16.4 characters per second |
+| 90th percentile | 29.0 characters per second |
+| Above 17 | 1 cue |
+| Above 21 | 1 cue |
+
+One cue is dense for its length because the speech itself is dense: splitting it
+into more cues cannot lower its characters per second, since the time is shared
+in proportion to the text. Layout keeps a one second floor and never runs past
+the segment, so the remaining fix is rewriting the line, which belongs to the
+dubbing milestone.
+
+### What this measurement does not say
+
+- One clip, one model, nine seconds. It shows the tool works and where the
+  ceiling sits, not the distribution over a real corpus.
+- Reading speed is measured on characters, not on how hard the words are.
+
 ## Planned measurements
 
 The roadmap calls for a wider suite: noisy and multi-speaker audio, other
