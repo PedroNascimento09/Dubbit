@@ -4,9 +4,10 @@ use crate::error::Result;
 use crate::files::atomic_write;
 use crate::segments::Segment;
 
-pub const MIN_CUE: f64 = 0.4;
+pub const MIN_CUE: f64 = 1.0;
 pub const MAX_LINE: usize = 42;
 pub const MAX_CUE_LINES: usize = 2;
+pub const READ_RATE: f64 = 17.0;
 
 #[derive(Debug, Clone, PartialEq)]
 pub struct Cue {
@@ -75,6 +76,64 @@ fn sentences(text: &str) -> Vec<String> {
     units
 }
 
+pub fn reading_speed(text: &str, start: f64, end: f64) -> f64 {
+    let characters = text.chars().filter(|item| *item != '\n').count() as f64;
+    let duration = (end - start).max(0.0);
+    if duration <= 0.0 {
+        return f64::INFINITY;
+    }
+    characters / duration
+}
+
+fn block_chars(text: &str) -> f64 {
+    text.chars().filter(|item| *item != '\n').count() as f64
+}
+
+fn allotted(blocks: &[String], duration: f64) -> Vec<f64> {
+    let total: f64 = blocks.iter().map(|block| block_chars(block)).sum();
+    if total <= 0.0 {
+        return Vec::new();
+    }
+    let mut times: Vec<f64> = blocks
+        .iter()
+        .map(|block| duration * block_chars(block) / total)
+        .collect();
+    let shortest = times.iter().cloned().fold(f64::INFINITY, f64::min);
+    if shortest < MIN_CUE {
+        let share = duration / blocks.len() as f64;
+        return vec![share; blocks.len()];
+    }
+    for time in times.iter_mut() {
+        *time = time.max(MIN_CUE);
+    }
+    let summed: f64 = times.iter().sum();
+    if summed > duration {
+        let share = duration / blocks.len() as f64;
+        return vec![share; blocks.len()];
+    }
+    let spare = duration - summed;
+    let readable: Vec<f64> = blocks
+        .iter()
+        .map(|block| block_chars(block) / READ_RATE)
+        .collect();
+    let hungry: f64 = readable
+        .iter()
+        .zip(times.iter())
+        .map(|(need, have)| (need - have).max(0.0))
+        .sum();
+    if hungry <= 0.0 {
+        if let Some(last) = times.last_mut() {
+            *last += spare;
+        }
+        return times;
+    }
+    for (time, need) in times.iter_mut().zip(readable.iter()) {
+        let gap = (need - *time).max(0.0);
+        *time += spare * gap / hungry;
+    }
+    times
+}
+
 fn split_lines(lines: Vec<String>) -> Vec<String> {
     let mut blocks = Vec::new();
     let mut current: Vec<String> = Vec::new();
@@ -102,23 +161,16 @@ pub fn cues(segments: &[Segment], translated: bool) -> Vec<Cue> {
         for sentence in sentences(&text) {
             blocks.extend(split_lines(wrap_text(&sentence, MAX_LINE)));
         }
-        let total_chars: usize = blocks
-            .iter()
-            .map(|block| block.chars().filter(|item| *item != '\n').count())
-            .sum();
-        if total_chars == 0 {
+        let duration = segment.end - segment.start;
+        let times = allotted(&blocks, duration);
+        if times.is_empty() {
             continue;
         }
-        let duration = segment.end - segment.start;
-        let mut consumed = 0_usize;
-        for block in blocks {
-            let chars = block.chars().filter(|item| *item != '\n').count();
-            let start = segment.start + duration * (consumed as f64 / total_chars as f64);
-            consumed += chars;
-            let end = segment.start + duration * (consumed as f64 / total_chars as f64);
-            let end = end
-                .max(start + MIN_CUE)
-                .min(segment.end.max(start + MIN_CUE));
+        let mut cursor = segment.start;
+        for (block, time) in blocks.into_iter().zip(times) {
+            let start = cursor;
+            let end = (start + time).min(segment.end);
+            cursor = end;
             cues.push(Cue {
                 start,
                 end,
@@ -208,9 +260,51 @@ mod tests {
     }
 
     #[test]
-    fn short_cues_are_extended() {
+    fn segment_shorter_than_the_floor_keeps_its_time() {
         let rendered = render_srt(&[Segment::new(0, 0.0, 0.1, "Hi")], false);
-        assert!(rendered.contains("00:00:00,000 --> 00:00:00,400"));
+        assert!(rendered.contains("00:00:00,000 --> 00:00:00,100"));
+    }
+
+    #[test]
+    fn slow_segment_stays_in_one_cue() {
+        let segments = vec![Segment::new(0, 0.0, 4.0, "Hello there")];
+        let cues = cues(&segments, false);
+        assert_eq!(cues.len(), 1);
+        assert_eq!(cues[0].start, 0.0);
+        assert!((cues[0].end - 4.0).abs() < 1e-9);
+    }
+
+    #[test]
+    fn dense_segment_shares_its_time_between_cues() {
+        let text = "This sentence is long enough to need several cues on screen at once, and the speaker says it far too quickly for anyone to read every word of it comfortably.";
+        let segments = vec![Segment::new(0, 0.0, 3.0, text)];
+        let cues = cues(&segments, false);
+        assert!(cues.len() > 1);
+        assert!((cues[0].start).abs() < 1e-9);
+        assert!((cues[cues.len() - 1].end - 3.0).abs() < 1e-9);
+        for pair in cues.windows(2) {
+            assert!((pair[0].end - pair[1].start).abs() < 1e-9);
+        }
+        for cue in &cues {
+            assert!(cue.end > cue.start);
+            assert!(cue.end <= 3.0 + 1e-9);
+        }
+        let joined = cues
+            .iter()
+            .map(|cue| flatten(&cue.text))
+            .collect::<Vec<String>>()
+            .join(" ");
+        assert_eq!(joined, flatten(text));
+    }
+
+    #[test]
+    fn no_cue_exceeds_the_reading_rate_when_the_segment_allows() {
+        let text = "Hello there! This is a test of the subtitle pipeline. It should produce two subtitle files without dropping a single word from the transcript.";
+        let segments = vec![Segment::new(0, 0.0, 14.0, text)];
+        for cue in cues(&segments, false) {
+            assert!(reading_speed(&cue.text, cue.start, cue.end) <= READ_RATE + 1e-6);
+            assert!(cue.end - cue.start >= MIN_CUE - 1e-6);
+        }
     }
 
     #[test]
