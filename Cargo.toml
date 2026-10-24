@@ -14,7 +14,7 @@ repository = "https://github.com/PedroNascimento09/Dubbit"
 serde = { version = "1.0.210", features = ["derive"] }
 serde_json = "1.0.128"
 sha2 = "0.10.8"
-ureq = { version = "2.10.1", default-features = false, features = ["tls", "native-certs", "json"] }
+ureq = { version = "3.5.0", default-features = false, features = ["rustls", "platform-verifier", "json", "gzip"] }
 csv = "1.3.1"
 tempfile = "3.13.0"
 clap = { version = "4.5.20", features = ["derive"] }
