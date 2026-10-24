@@ -8,8 +8,9 @@ import urllib.error
 import urllib.request
 import zipfile
 
-from argos_engine import translator
 from sacrebleu.metrics import BLEU, CHRF
+
+from argos_engine import translator
 
 ROOT = pathlib.Path(__file__).resolve().parent.parent
 CACHE = ROOT / ".tools" / "benchmarks"
