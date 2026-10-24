@@ -4,7 +4,7 @@ Dubbit is Apache-2.0 licensed. It depends on the work below, which keeps its own
 licence. This page records what is used, under which terms, and whether it is
 linked into Dubbit or run as a separate executable.
 
-Verified 2026-10-23 against the licence metadata of each published package and
+Verified 2026-10-24 against the licence metadata of each published package and
 the licence files shipped with each program.
 
 ## Separate executables
@@ -14,8 +14,8 @@ and output with them. They are not linked into the Dubbit code.
 
 | Program | Used for | Licence | Distribution note |
 | --- | --- | --- | --- |
-| FFmpeg and FFprobe | Probing media and extracting audio | LGPL-2.1-or-later, or GPL-2.0-or-later depending on the build | Release artefacts must ship an LGPL build without GPL-only components, with its source offer and licence texts. The repository does not contain FFmpeg binaries. |
-| whisper-cli | Speech recognition | MIT | Supplied by the user, or bundled later as a separate executable with its licence file. The repository does not contain the executable. |
+| FFmpeg and FFprobe | Probing media and extracting audio | LGPL-3.0-or-later | The installer and the portable package ship build N-127957-g935f29eaae, an LGPL build without GPL-only components, with its licence text and source location in `apps/desktop/src-tauri/resources/licenses/`. The repository does not contain the binaries: `scripts/bundle-tools.py` fetches them from the pinned entry in `models/tools.json` and checks size and SHA-256. |
+| whisper-cli | Speech recognition | MIT | The installer and the portable package ship build b5454, version 1.9.5, with its MIT text in the same folder. Fetched the same way from the pinned manifest. |
 
 The `dub` pipeline communicates with both through the command line only. No
 FFmpeg or whisper.cpp headers, objects or static libraries are linked into the
