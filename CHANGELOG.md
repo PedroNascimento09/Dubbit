@@ -20,6 +20,8 @@ All notable changes to this project are documented here. The format follows Keep
 - The installer ships the licence text of every bundled program in a `licenses` folder, and the FFmpeg build is now the LGPL variant without GPL-only components.
 - `scripts/checksums.py` writes SHA-256 side files, and `scripts/sbom.py` writes a CycloneDX bill of materials from the Cargo graph.
 - Release workflow builds the Windows installer, a portable Windows package, a Linux `.deb` and AppImage, the command line archives, one checksum file and the bill of materials, and publishes them together.
+- Translation quality benchmark: `benchmarks/translation_quality.py` samples a parallel corpus deterministically, translates it with the local model and prints chrF, BLEU and cost per segment, with a line translator that can serve as the command backend.
+- First published translation numbers for English and Portuguese on Tatoeba and Wikimedia, with method and limits in the benchmarks page.
 - Test that the command line works from a data folder with accents and spaces, and an ignored end-to-end test that subtitles a real media file when the tools are present.
 
 ### Changed
