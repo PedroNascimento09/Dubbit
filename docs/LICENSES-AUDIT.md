@@ -47,10 +47,25 @@ assessment so the decision is not repeated from memory later.
 | espeak-ng | GPL-3.0 | Yes, with copyleft conditions | Separate executable only, and only if a permissive alternative fails |
 | Demucs | MIT | Yes | Candidate for background separation |
 
+## Weak copyleft inside the desktop window
+
+The desktop window pulls a small set of Mozilla Public License 2.0 crates:
+`cssparser`, `cssparser-macros`, `selectors`, `dtoa-short` and `option-ext`.
+They arrive below `tauri-utils` and `dirs`, and none of them is modified.
+MPL-2.0 is file-level copyleft: linking it with Apache-2.0 code is allowed,
+and the obligation is to publish changes to those files, which do not exist.
+The licence is allowed in `deny.toml` for that reason and for no other. GPL and
+AGPL code remains excluded, and no GPL or AGPL binary is linked.
+
 ## Checks
 
 - `cargo deny check licenses` runs in continuous integration against
   `deny.toml`, which allows only the permissive licence set above.
+- `cargo deny check` also covers advisories, bans and sources. One advisory is
+  ignored: `RUSTSEC-2024-0370` for `proc-macro-error`, which reaches the build
+  only through the GTK bindings that Tauri uses on Linux, runs as a build-time
+  macro and has no newer upstream release. The ignore is recorded with its
+  reason in `deny.toml`.
 - The model manifest is reviewed by hand when a model is added; a checksum or
   licence mismatch fails the review.
 - Release notes record any licence change and the date it was verified.
