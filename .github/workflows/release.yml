@@ -46,7 +46,7 @@ jobs:
           (cd dist/stage-cli && 7z a ../dubbit-windows-x86_64.zip .)
           (cd dist/stage-portable && 7z a ../dubbit-windows-x86_64-portable.zip .)
           rm -rf dist/stage-cli dist/stage-portable
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7
         with:
           name: windows
           path: dist/*
@@ -87,7 +87,7 @@ jobs:
           cp target/release/bundle/deb/*.deb dist/
           cp target/release/bundle/appimage/*.AppImage dist/
           tar -czf dist/dubbit-linux-x86_64.tar.gz -C target/release dubbit -C "$PWD" LICENSE NOTICE README.md
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7
         with:
           name: linux
           path: dist/*
