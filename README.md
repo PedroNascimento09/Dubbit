@@ -57,16 +57,16 @@ interview.dubbit/
   subtitles/pt.vtt
 ```
 
-To use the window instead of the command line:
+To use the window instead of the command line, with FFmpeg, FFprobe and the speech recogniser bundled into an installer:
 
 ```sh
+bash scripts/bundle-tools.sh
 cd apps/desktop
 npm install
-npm run tauri build -- --no-bundle
-./target/release/dubbit-desktop
+npm run tauri build
 ```
 
-The window is documented in [docs/gui.md](docs/gui.md). It needs the same tools as the command line.
+The installer lands in `target/release/bundle/nsis/`. The window is documented in [docs/gui.md](docs/gui.md), and [docs/install.md](docs/install.md) covers what is inside it.
 
 ## Commands
 
