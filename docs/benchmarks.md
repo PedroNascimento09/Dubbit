@@ -1,8 +1,9 @@
 # Benchmarks
 
 Dubbit publishes only measurements it made itself, with the command used to make
-them. Two measurements exist: a short clip that shows start-up cost, and a long
-file that shows throughput under a hard memory cap.
+them. Four measurements exist: a short clip that shows start-up cost, a long
+file that shows throughput under a hard memory cap, word error rate on public
+speech, and translation quality on public sentence pairs.
 
 ## How to reproduce a transcription measurement
 
@@ -106,14 +107,65 @@ the corpus build and the exact commands.
   still match the reference words.
 - Scores are on a concatenated stream of separate clips, not a real recording
   with natural turn taking.
-- No other model family, no other decoding setting, and no translated output was
-  scored. Translation quality remains unmeasured.
+- No other model family and no other decoding setting was scored. Translation
+  quality is measured separately, in Measurement 4.
+
+## Measurement 4: translation quality
+
+| Field | Value |
+| --- | --- |
+| Date | 2026-10-24 |
+| Engine | OPUS-MT weights as packaged by Argos Translate 1.9, run through CTranslate2 4.x on CPU, int8, default decoding |
+| Corpus 1 | Tatoeba en-pt, version 2023-04-12, CC BY 2.0 FR, 200 sentence pairs sampled with seed 2026 |
+| Corpus 2 | Wikimedia en-pt, version 20230407, CC BY-SA, 200 sentence pairs, same filter and seed |
+| Filter | both sides between 20 and 200 characters, duplicate sources removed |
+| Metric | chrF and BLEU from SacreBLEU 2.6, defaults |
+| System | Windows 11, 12 logical cores, 15 GB of RAM, no GPU |
+
+| Pair | Corpus | chrF | BLEU | Segments | Source words | Seconds |
+| --- | --- | --- | --- | --- | --- | --- |
+| en → pt | Tatoeba | 68.45 | 49.18 | 200 | 1399 | 11.3 |
+| pt → en | Tatoeba | 76.87 | 65.02 | 200 | 1500 | 12.3 |
+| en → pt | Wikimedia | 71.06 | 52.49 | 200 | 3549 | 37.6 |
+| pt → en | Wikimedia | 71.67 | 52.36 | 200 | 3355 | 34.4 |
+
+Cost is 0.06 seconds per short sentence and 0.17 to 0.19 seconds per longer
+one, which is two to three orders of magnitude below the transcription stage.
+Translation is not a bottleneck.
+
+The commands:
+
+```sh
+python benchmarks/translation_quality.py --corpus tatoeba --source en --target pt --limit 200
+python benchmarks/translation_quality.py --corpus tatoeba --source pt --target en --limit 200
+python benchmarks/translation_quality.py --corpus wikimedia --source en --target pt --limit 200
+python benchmarks/translation_quality.py --corpus wikimedia --source pt --target en --limit 200
+```
+
+### What this measurement does not say
+
+- These are automatic metrics, not reader judgement. Nobody who speaks the pair
+  has read the output yet. A chrF near 70 hides flat sentences, wrong register
+  and mistranslated names; the plan still requires a written review per pair.
+- Tatoeba is short, simple and very likely inside the model's training data, so
+  the two Tatoeba rows are optimistic. The Wikimedia rows are the more honest
+  signal for real text.
+- Only English and Portuguese. Spanish, French and German have no number, and
+  neither does any pair reached through a pivot language.
+- Nothing was measured through the product's own pipeline. The benchmark runs
+  the model directly, because the shipped path offers a local server or an
+  external command, and this machine has neither wired to a model. Subtitle
+  segment boundaries, glossary protection and cue splitting are outside the
+  measurement.
+- Tatoeba and Wikimedia sentences are already clean text. Speech that has been
+  transcribed with errors will translate worse, and that compounding is not
+  measured here.
 
 ## Planned measurements
 
 The roadmap calls for a wider suite: noisy and multi-speaker audio, other
-languages, a translation quality metric per language pair, and the largest
-model. Results will be added here with the raw numbers and the exact commands,
+languages, a translation number for every language pair that would be
+advertised, a reader review of translated output, and the largest model. Results will be added here with the raw numbers and the exact commands,
 and previous entries will be kept rather than edited.
 
 ## Rules
