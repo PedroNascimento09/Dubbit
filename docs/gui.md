@@ -2,7 +2,7 @@
 
 The desktop window is the normal way to use Dubbit. It wraps the same engine as the command line: same project folders, same checkpoints, same subtitle files.
 
-Status: development preview. There are no installers yet, so today it is built and run from source. Installation is the next milestone.
+Status: development preview. A Windows installer can be built from source and installs the window with FFmpeg, FFprobe and the speech recogniser included. There is no public release yet.
 
 ## What the window does
 
@@ -47,15 +47,16 @@ The window follows the system light or dark appearance and can be switched by ha
 
 ## Build and run from source
 
-Prerequisites are the same as the command line: Rust, FFmpeg, FFprobe and a `whisper-cli` build. Node.js is needed for the interface.
+Prerequisites are Rust, Node.js, and a folder holding FFmpeg, FFprobe and a `whisper-cli` build with its companion libraries.
 
 ```sh
+bash scripts/bundle-tools.sh
 cd apps/desktop
 npm install
-npm run tauri build -- --no-bundle
+npm run tauri build
 ```
 
-The build embeds the interface and leaves the binary in `target/release`. Start it with the same environment variables the command line uses:
+The build embeds the interface and the media tools. It leaves the installer in `target/release/bundle/nsis/` and a runnable binary in `target/release`. The installed window needs no environment variables. A bare binary works when the tools sit in a `bin` folder beside it, or when the variables point at them:
 
 ```sh
 export DUBBIT_TOOLS_DIR=/path/to/tools
