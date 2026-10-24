@@ -16,12 +16,11 @@ path = "src/main.rs"
 tauri-build = { version = "2", features = [] }
 
 [dependencies]
-dubbit-core = { path = "../../../core" }
+dubbit-core = { path = "../../../core", version = "0.1.0" }
 serde.workspace = true
 serde_json.workspace = true
 tauri = { version = "2", features = ["protocol-asset"] }
 tauri-plugin-dialog = "2"
-tauri-plugin-opener = "2"
 
 [dev-dependencies]
 tempfile.workspace = true
