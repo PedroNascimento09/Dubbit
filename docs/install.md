@@ -4,16 +4,16 @@ Dubbit runs on your machine and produces subtitles from video or audio. This pag
 
 ## Windows installer
 
-The window ships with FFmpeg, FFprobe and the speech recogniser, so nothing else has to be installed by hand. There is no public release yet; build the installer from source with Node.js, Rust and the tools in `.tools/bin` and `.tools/whisper/bin/Release`:
+The window ships with FFmpeg, FFprobe and the speech recogniser, so nothing else has to be installed by hand. There is no public release yet; build the installer from source with Node.js, Rust and Python, which fetches the bundled programs from their pinned, checksummed manifest:
 
 ```sh
-bash scripts/bundle-tools.sh
+python scripts/bundle-tools.py
 cd apps/desktop
 npm install
 npm run tauri build
 ```
 
-The installer is written to `target/release/bundle/nsis/` and measured about 97 MiB with the bundled tools. Running it installs for the current user in `%LOCALAPPDATA%\Dubbit Desktop`, without administrator rights.
+The installer is written to `target/release/bundle/nsis/` and measured 87 MiB with the bundled tools. Running it installs for the current user in `%LOCALAPPDATA%\Dubbit Desktop`, without administrator rights. The folder also holds `bin`, with the bundled programs, and `licenses`, with the licence text of each of them.
 
 Speech models are not inside the installer. The window downloads the model it needs the first time, with the size shown before it starts, and keeps it in `%LOCALAPPDATA%\Dubbit\models`.
 
