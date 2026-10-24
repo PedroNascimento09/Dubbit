@@ -4,6 +4,7 @@ import json
 import pathlib
 import random
 import time
+import urllib.error
 import urllib.request
 import zipfile
 
@@ -13,25 +14,31 @@ from sacrebleu.metrics import BLEU, CHRF
 ROOT = pathlib.Path(__file__).resolve().parent.parent
 CACHE = ROOT / ".tools" / "benchmarks"
 CORPORA = {
-    "tatoeba": "https://object.pouta.csc.fi/OPUS-Tatoeba/v2023-04-12/moses/en-pt.txt.zip",
-    "wikimedia": "https://object.pouta.csc.fi/OPUS-wikimedia/v20230407/moses/en-pt.txt.zip",
+    "tatoeba": "https://object.pouta.csc.fi/OPUS-Tatoeba/v2023-04-12/moses/{pair}.txt.zip",
+    "wikimedia": "https://object.pouta.csc.fi/OPUS-wikimedia/v20230407/moses/{pair}.txt.zip",
 }
 MINIMUM = 20
 MAXIMUM = 200
 
 
-def prepare(name: str) -> pathlib.Path:
-    folder = CACHE / f"{name}-en-pt"
-    if folder.is_dir() and any(folder.glob("*.en")):
+def prepare(name: str, source: str, target: str) -> pathlib.Path:
+    for pair in (f"{source}-{target}", f"{target}-{source}"):
+        folder = CACHE / f"{name}-{pair}"
+        if folder.is_dir() and any(folder.glob(f"*.{source}")):
+            return folder
+        archive = CACHE / f"{name}-{pair}.zip"
+        CACHE.mkdir(parents=True, exist_ok=True)
+        if not archive.is_file():
+            url = CORPORA[name].format(pair=pair)
+            print(f"downloading {url}")
+            try:
+                urllib.request.urlretrieve(url, archive)
+            except urllib.error.HTTPError:
+                continue
+        with zipfile.ZipFile(archive) as bundle:
+            bundle.extractall(folder)
         return folder
-    archive = CACHE / f"{name}-en-pt.zip"
-    CACHE.mkdir(parents=True, exist_ok=True)
-    if not archive.is_file():
-        print(f"downloading {CORPORA[name]}")
-        urllib.request.urlretrieve(CORPORA[name], archive)
-    with zipfile.ZipFile(archive) as bundle:
-        bundle.extractall(folder)
-    return folder
+    raise SystemExit(f"no {name} corpus for {source}-{target}")
 
 
 def pairs(
@@ -54,9 +61,14 @@ def pairs(
     return rows[:limit]
 
 
-def run(corpus: str, source: str, target: str, limit: int, seed: int) -> dict:
+def run(options) -> dict:
+    corpus = options.corpus
+    source = options.source
+    target = options.target
+    limit = options.limit
+    seed = options.seed
     engine = translator(source, target)
-    sample = pairs(prepare(corpus), source, target, limit, seed)
+    sample = pairs(prepare(corpus, source, target), source, target, limit, seed)
     hypotheses = []
     started = time.perf_counter()
     for text, _ in sample:
@@ -65,6 +77,12 @@ def run(corpus: str, source: str, target: str, limit: int, seed: int) -> dict:
     references = [text for _, text in sample]
     chrf = CHRF().corpus_score(hypotheses, [references]).score
     bleu = BLEU().corpus_score(hypotheses, [references]).score
+    if options.examples:
+        for (text, reference), hypothesis in list(zip(sample, hypotheses))[: options.examples]:
+            print(f"source:  {text}")
+            print(f"model:   {hypothesis}")
+            print(f"human:   {reference}")
+            print()
     return {
         "corpus": corpus,
         "pair": f"{source}-{target}",
@@ -86,8 +104,9 @@ def main() -> int:
     parser.add_argument("--limit", type=int, default=200)
     parser.add_argument("--seed", type=int, default=2026)
     parser.add_argument("--json", type=pathlib.Path)
+    parser.add_argument("--examples", type=int, default=0)
     options = parser.parse_args()
-    result = run(options.corpus, options.source, options.target, options.limit, options.seed)
+    result = run(options)
     print(json.dumps(result, indent=2))
     if options.json:
         options.json.parent.mkdir(parents=True, exist_ok=True)
