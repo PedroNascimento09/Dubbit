@@ -1,12 +1,14 @@
 use std::fs;
 use std::path::{Path, PathBuf};
+use std::sync::atomic::{AtomicBool, Ordering};
+use std::sync::Arc;
 use std::time::Instant;
 
 use serde::Serialize;
 
 use crate::config::TranslatorChoice;
 use crate::engines::{asr, translate, Translator};
-use crate::error::{filesystem_failed, output_exists, Result};
+use crate::error::{cancelled, filesystem_failed, output_exists, Result};
 use crate::glossary;
 use crate::languages;
 use crate::media;
@@ -15,6 +17,7 @@ use crate::project::{
     fingerprint, Options, Project, SourceRef, Workspace, STAGE_INGEST, STAGE_SUBTITLES,
     STAGE_TRANSCRIBE, STAGE_TRANSLATE,
 };
+use crate::segments::Segment;
 use crate::subtitles;
 
 #[derive(Debug, Clone)]
@@ -33,6 +36,7 @@ pub struct Request {
     pub formats: Vec<String>,
     pub translate: bool,
     pub resume: bool,
+    pub cancel: Option<Arc<AtomicBool>>,
 }
 
 #[derive(Debug, Clone)]
@@ -74,6 +78,22 @@ fn relative(workspace: &Workspace, path: &Path) -> String {
         .unwrap_or(path)
         .to_string_lossy()
         .replace('\\', "/")
+}
+
+fn stop_requested(request: &Request) -> bool {
+    request
+        .cancel
+        .as_ref()
+        .map(|flag| flag.load(Ordering::Relaxed))
+        .unwrap_or(false)
+}
+
+fn stop_point(request: &Request) -> Result<()> {
+    if stop_requested(request) {
+        Err(cancelled())
+    } else {
+        Ok(())
+    }
 }
 
 fn translate_language(request: &Request) -> Result<Option<String>> {
@@ -148,6 +168,7 @@ pub fn run(request: &Request, progress: &mut dyn FnMut(Event)) -> Result<Outcome
     };
 
     if !project.done(STAGE_INGEST) || !workspace.audio_file().is_file() {
+        stop_point(request)?;
         progress(Event::Stage(STAGE_INGEST));
         let duration = project.media.as_ref().map(|info| info.duration);
         media::extract_audio(&source, &workspace.audio_file(), duration)?;
@@ -157,6 +178,7 @@ pub fn run(request: &Request, progress: &mut dyn FnMut(Event)) -> Result<Outcome
 
     let model_path = models::resolve_model(&project.options.asr_model)?;
     if !project.done(STAGE_TRANSCRIBE) || project.segments.is_empty() {
+        stop_point(request)?;
         progress(Event::Stage(STAGE_TRANSCRIBE));
         let options = asr::TranscribeOptions {
             model: model_path,
@@ -184,6 +206,7 @@ pub fn run(request: &Request, progress: &mut dyn FnMut(Event)) -> Result<Outcome
     let target = project.options.target_language.clone();
     let wants_translation = project.options.translate && target.is_some();
     if wants_translation && !project.done(STAGE_TRANSLATE) {
+        stop_point(request)?;
         progress(Event::Stage(STAGE_TRANSLATE));
         let glossary = match &request.glossary {
             Some(path) => Some(glossary::load(path)?),
@@ -207,25 +230,9 @@ pub fn run(request: &Request, progress: &mut dyn FnMut(Event)) -> Result<Outcome
     }
 
     if !project.done(STAGE_SUBTITLES) {
+        stop_point(request)?;
         progress(Event::Stage(STAGE_SUBTITLES));
-        workspace.ensure_dir(&workspace.subtitles_dir())?;
-        for format in &project.options.formats {
-            for translated in [false, true] {
-                if translated && !wants_translation {
-                    continue;
-                }
-                let language = if translated {
-                    target.clone().unwrap_or_else(|| "und".to_string())
-                } else {
-                    source_language.clone()
-                };
-                let path = workspace.subtitle_path(&language, format);
-                match format.as_str() {
-                    "vtt" => subtitles::write_vtt(&path, &project.segments, translated)?,
-                    _ => subtitles::write_srt(&path, &project.segments, translated)?,
-                }
-            }
-        }
+        write_subtitles(&workspace, &project)?;
         project.mark(STAGE_SUBTITLES);
         workspace.save(&mut project)?;
     }
@@ -251,6 +258,50 @@ fn translator_for(request: &Request) -> Box<dyn Translator> {
         ..crate::config::Settings::default()
     };
     translate::build(&settings)
+}
+
+pub fn write_subtitles(workspace: &Workspace, project: &Project) -> Result<()> {
+    let source_language = project
+        .options
+        .source_language
+        .clone()
+        .unwrap_or_else(|| "und".to_string());
+    let target = project.options.target_language.clone();
+    let translated_wanted = project.options.translate && target.is_some();
+    workspace.ensure_dir(&workspace.subtitles_dir())?;
+    for format in &project.options.formats {
+        for translated in [false, true] {
+            if translated && !translated_wanted {
+                continue;
+            }
+            let language = if translated {
+                target.clone().unwrap_or_else(|| "und".to_string())
+            } else {
+                source_language.clone()
+            };
+            let path = workspace.subtitle_path(&language, format);
+            match format.as_str() {
+                "vtt" => subtitles::write_vtt(&path, &project.segments, translated)?,
+                _ => subtitles::write_srt(&path, &project.segments, translated)?,
+            }
+        }
+    }
+    Ok(())
+}
+
+pub fn save_review(
+    workspace: &Workspace,
+    project: &mut Project,
+    segments: Vec<Segment>,
+) -> Result<Vec<String>> {
+    project.segments = segments;
+    workspace.write_segments("source", &project.segments)?;
+    if project.options.translate && project.options.target_language.is_some() {
+        workspace.write_segments("translated", &project.segments)?;
+    }
+    write_subtitles(workspace, project)?;
+    workspace.save(project)?;
+    subtitle_files(workspace)
 }
 
 pub fn subtitle_files(workspace: &Workspace) -> Result<Vec<String>> {
@@ -282,4 +333,73 @@ pub fn stage_summary(project: &Project) -> Vec<(&'static str, bool)> {
     .iter()
     .map(|stage| (*stage, project.done(stage)))
     .collect()
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use crate::media::MediaInfo;
+
+    fn project(dir: &Path) -> Project {
+        let media = MediaInfo {
+            path: dir.join("input.mp4"),
+            duration: 4.0,
+            size_bytes: 10,
+            has_video: true,
+            has_audio: true,
+            video_codec: None,
+            width: None,
+            height: None,
+            fps: None,
+            audio_codec: None,
+            sample_rate: None,
+            channels: None,
+        };
+        Project::new(
+            SourceRef {
+                path: dir.join("input.mp4"),
+                sha256: "abc".to_string(),
+                size_bytes: 10,
+                duration: 4.0,
+            },
+            media,
+            Options {
+                source_language: Some("en".to_string()),
+                target_language: None,
+                asr_model: "whisper-tiny-q5_1".to_string(),
+                translator: "auto".to_string(),
+                translate: false,
+                formats: vec!["srt".to_string()],
+            },
+        )
+    }
+
+    #[test]
+    fn saving_a_review_rewrites_subtitles() {
+        let directory = tempfile::tempdir().unwrap();
+        let workspace = Workspace::open(directory.path());
+        let mut project = project(directory.path());
+        project.segments = vec![Segment::new(0, 0.0, 1.0, "old line")];
+        workspace.save(&mut project).unwrap();
+        write_subtitles(&workspace, &project).unwrap();
+        let mut edited = project.segments.clone();
+        edited[0].text = "new line".to_string();
+        let files = save_review(&workspace, &mut project, edited).unwrap();
+        assert_eq!(files, vec!["subtitles/en.srt".to_string()]);
+        let written = fs::read_to_string(workspace.subtitle_path("en", "srt")).unwrap();
+        assert!(written.contains("new line"));
+        assert!(!written.contains("old line"));
+    }
+
+    #[test]
+    fn review_updates_the_source_checkpoint() {
+        let directory = tempfile::tempdir().unwrap();
+        let workspace = Workspace::open(directory.path());
+        let mut project = project(directory.path());
+        let segments = vec![Segment::new(0, 0.0, 1.0, "first")];
+        save_review(&workspace, &mut project, segments).unwrap();
+        let stored = workspace.read_segments("source").unwrap();
+        assert_eq!(stored[0].text, "first");
+        assert_eq!(project.segments.len(), 1);
+    }
 }
