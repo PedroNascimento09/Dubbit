@@ -45,7 +45,8 @@ assessment so the decision is not repeated from memory later.
 | F5-TTS and similar weights | Often CC-BY-NC | No | Excluded from the default build |
 | pyannote weights | Gated terms | Restricted | Avoided as a default |
 | espeak-ng | GPL-3.0 | Yes, with copyleft conditions | Separate executable only, and only if a permissive alternative fails |
-| Demucs | MIT | Yes | Candidate for background separation |
+| Demucs weights | MIT code, weights for scientific use | No, not for redistribution as part of a commercial product | Ship only as an optional, user-requested download with the licence shown; never bundled, never the default |
+| GTCRN | MIT, weights included | Yes | Accepted candidate for speech enhancement |
 
 ## Weak copyleft inside the desktop window
 
