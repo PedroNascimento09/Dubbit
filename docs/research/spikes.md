@@ -105,6 +105,13 @@ benchmarks do, and it removes the obvious choices.
 | Demucs | Vocals against music | 166 MB FP16 | Maintainer states the weights are for scientific use only | Excluded |
 | UVR and MDX-Net | Vocals against music | 28 to 64 MB | No per-checkpoint licence | Excluded |
 
+The open-source route: our code is Apache-2.0 and the product is free, so a
+model that forbids commercial use is not automatically out. It may ship as an
+optional, user-requested download, shown with its own licence and never as the
+default, exactly as the audit already allows for non-commercial weights. That
+reopens the music separators as optional downloads; it does not reopen them as
+bundled defaults, and it does not make their licences compatible.
+
 What this means: for a noisy interview, GTCRN is the only model that can be
 shipped today, and it cleans speech rather than separating a music bed. For
 dubbing, where the music has to be kept and the voice replaced, nothing on the
