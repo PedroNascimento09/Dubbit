@@ -19,9 +19,9 @@ Dubbit ships in small milestones, each one usable and tested before the next sta
 - A Windows installer and a portable Windows package exist and bundle the media tools at pinned, verified versions, but they have been installed on one machine only, never on a clean virtual machine. The Linux build is defined in the release workflow and has not run yet. There is no public release.
 - The desktop window is a development preview: the queue, the review editor and the save path work.
 - macOS is untested. Only Windows and Linux are on the tested path.
-- FFmpeg and the speech recognition executable are supplied by the user; they are not bundled yet.
+- The installer bundles FFmpeg and the speech recognition executable; the command line build still expects both on the machine.
 - One model family covers recognition, with four sizes and no alternative engines.
-- Translation quality has not been measured yet. Only the local model server, passthrough and command backends exist.
+- Translation now has first automatic numbers for English and Portuguese only, on two public corpora, and no reader review. No other pair has a number, and the product still reaches a model through the local server or the command backend rather than shipping one.
 
 ## How the scope is cut
 
