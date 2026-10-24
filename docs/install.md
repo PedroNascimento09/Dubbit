@@ -2,6 +2,25 @@
 
 Dubbit runs on your machine and produces subtitles from video or audio. This page installs the current source build on Windows or Linux. macOS is not tested yet.
 
+## Windows installer
+
+The window ships with FFmpeg, FFprobe and the speech recogniser, so nothing else has to be installed by hand. There is no public release yet; build the installer from source with Node.js, Rust and the tools in `.tools/bin` and `.tools/whisper/bin/Release`:
+
+```sh
+bash scripts/bundle-tools.sh
+cd apps/desktop
+npm install
+npm run tauri build
+```
+
+The installer is written to `target/release/bundle/nsis/` and measured about 97 MiB with the bundled tools. Running it installs for the current user in `%LOCALAPPDATA%\Dubbit Desktop`, without administrator rights.
+
+Speech models are not inside the installer. The window downloads the model it needs the first time, with the size shown before it starts, and keeps it in `%LOCALAPPDATA%\Dubbit\models`.
+
+Uninstalling removes the program and leaves the data folder, with your models and queue, in place.
+
+The rest of this page covers the command line and building from source without the installer.
+
 ## What you need
 
 - Rust, installed with `rustup`. The pinned toolchain in `rust-toolchain.toml` is selected automatically.
@@ -132,7 +151,7 @@ dubbit config path
 
 ## Uninstall
 
-Delete the binary, the data folder and the project folders you created. No service, registry key or startup entry is installed.
+Uninstall Dubbit Desktop from Windows settings, or delete the binary when it was built from source. Then delete the data folder and the project folders you created. No service, registry key or startup entry is left behind.
 
 ## Before you file a bug
 
