@@ -154,6 +154,28 @@ impl Translator for CommandTranslator {
     }
 }
 
+pub fn configured(settings: &Settings) -> Option<String> {
+    let command = settings
+        .translator_command
+        .as_deref()
+        .map(str::trim)
+        .filter(|value| !value.is_empty());
+    match settings.translator {
+        TranslatorChoice::Command => command.map(|_| "Custom command".to_string()),
+        TranslatorChoice::Ollama => Some(format!("Local model, {}", settings.ollama_model)),
+        TranslatorChoice::Auto => {
+            if command.is_some() {
+                return Some("Custom command".to_string());
+            }
+            let ollama = Ollama::new(&settings.ollama_host, &settings.ollama_model);
+            ollama
+                .probe()
+                .then(|| format!("Local model, {}", settings.ollama_model))
+        }
+        TranslatorChoice::Passthrough => None,
+    }
+}
+
 pub fn build(settings: &Settings) -> Box<dyn Translator> {
     match settings.translator {
         TranslatorChoice::Auto => match &settings.translator_command {
