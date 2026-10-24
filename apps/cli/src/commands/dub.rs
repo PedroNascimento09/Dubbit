@@ -75,6 +75,7 @@ pub fn run(args: &DubArgs, json: bool, verbose: bool) -> Result<(), DubbitError>
         formats,
         translate: !args.no_translate,
         resume: args.resume,
+        cancel: None,
     };
 
     let total = if args.target.is_some() && !args.no_translate {
