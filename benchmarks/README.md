@@ -13,6 +13,7 @@ corpus exists.
 | `translation_quality.py` | Samples a parallel corpus, translates every source sentence with the local model, and prints chrF, BLEU, segment count and time per segment |
 | `argos_engine.py` | Loads the installed translation model through CTranslate2 and returns a function that translates one sentence |
 | `argos_line.py` | Reads one line on standard input and writes the translation on standard output, so it can serve as the product's command backend on Linux and macOS |
+| `ollama_shim.py` | Speaks the local model server protocol on a loopback port and answers with the same engine, so the product's own translation stage can be exercised with a real model |
 
 ## Corpus
 
@@ -67,6 +68,21 @@ of the product.
 python benchmarks/translation_quality.py --corpus tatoeba --source en --target pt --limit 200
 python benchmarks/translation_quality.py --corpus wikimedia --source pt --target en --limit 200
 ```
+
+## Running the product against the model
+
+The shim lets the shipped pipeline use the model without installing a model
+server:
+
+```sh
+python benchmarks/ollama_shim.py --port 11500 &
+dubbit config set ollama-host http://127.0.0.1:11500
+dubbit dub clip.mp4 --from en --to pt --translator ollama --model whisper-tiny-q5_1
+```
+
+The first call loads the model, which takes a few seconds; every later line is
+fast. This is a measuring tool for the translation stage, not a supported way
+to run Dubbit day to day.
 
 ## Interpretation
 
