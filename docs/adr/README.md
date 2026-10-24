@@ -10,3 +10,5 @@ A decision record states one choice, the context that forced it, and the cost ac
 | [0004](0004-project-format.md) | One folder per project, described by `project.json` |
 | [0005](0005-model-manifests.md) | Models are pinned in a manifest and downloaded by the user |
 | [0006](0006-language-first.md) | English first for code, commits and technical documentation |
+| [0007](0007-desktop-process.md) | The window is a thin shell over the core, with one queue in the app process |
+| [0008](0008-translation-runtime.md) | Translation stays behind a process boundary until an in-process runtime is proven |
