@@ -75,16 +75,23 @@ npm run dev
 
 `npm run dev` opens the interface in a browser with sample data, which is the fastest way to work on layout and interaction. No file is written in that mode.
 
-To run the real window, with the queue and the pipeline behind it:
+To run the real window, with the queue and the pipeline behind it, keep `npm run dev` running and then:
+
+```sh
+DUBBIT_TOOLS_DIR=/path/to/tools cargo run -p dubbit-desktop
+```
+
+A debug build loads the interface from `http://127.0.0.1:5173`, so the dev server must be up.
+
+A release build embeds the built interface and needs nothing at runtime except the tools and the model:
 
 ```sh
 cd apps/desktop
-npm run build
-cargo build -p dubbit-desktop
-DUBBIT_TOOLS_DIR=/path/to/tools ./target/debug/dubbit-desktop
+npm run tauri build -- --no-bundle
+./target/release/dubbit-desktop
 ```
 
-The shell loads the interface from `http://127.0.0.1:5173` while developing, so `npm run dev` must be running. A release build embeds the built interface and needs nothing at runtime except the tools and the model.
+`npm run tauri build` without `--no-bundle` also produces the installer. Building the crate with plain `cargo build --release` is not enough: the binary keeps pointing at the dev server.
 
 ## Project folder
 
