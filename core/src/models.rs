@@ -164,28 +164,29 @@ fn download(spec: &ModelSpec, progress: &mut dyn FnMut(u64, u64)) -> Result<()> 
         progress(spec.size, spec.size);
         return Ok(());
     }
-    let agent = ureq::AgentBuilder::new()
-        .timeout(Duration::from_secs(120))
-        .build();
+    let agent: ureq::Agent = ureq::Agent::config_builder()
+        .timeout_global(Some(Duration::from_secs(120)))
+        .build()
+        .into();
     let mut request = agent.get(&spec.url);
     if existing > 0 {
-        request = request.set("Range", &format!("bytes={existing}-"));
+        request = request.header("Range", format!("bytes={existing}-"));
     }
-    let response = match request.call() {
+    let mut response = match request.call() {
         Ok(response) => response,
-        Err(ureq::Error::Status(416, _)) if existing == spec.size => {
+        Err(ureq::Error::StatusCode(416)) if existing == spec.size => {
             verify_part(&part, spec)?;
             fs::rename(&part, &target)
                 .map_err(|error| filesystem_failed(&target, &error.to_string()))?;
             progress(spec.size, spec.size);
             return Ok(());
         }
-        Err(ureq::Error::Status(code, _)) => {
+        Err(ureq::Error::StatusCode(code)) => {
             return Err(download_failed(&spec.url, &format!("HTTP {code}")));
         }
         Err(error) => return Err(download_failed(&spec.url, &error.to_string())),
     };
-    let resume = existing > 0 && response.status() == 206;
+    let resume = existing > 0 && response.status().as_u16() == 206;
     let mut received = if resume { existing } else { 0 };
     let mut file = if resume {
         OpenOptions::new()
@@ -195,7 +196,7 @@ fn download(spec: &ModelSpec, progress: &mut dyn FnMut(u64, u64)) -> Result<()> 
     } else {
         File::create(&part).map_err(|error| filesystem_failed(&part, &error.to_string()))?
     };
-    let mut reader = response.into_reader();
+    let mut reader = response.body_mut().as_reader();
     let mut buffer = vec![0_u8; CHUNK];
     loop {
         let read = reader
