@@ -26,7 +26,7 @@ This is an early build, run from source, and its promise today is subtitles only
 
 ## What is not here yet
 
-- No installers. The window and the binary are built from source for now.
+- The Windows installer is built from source and has been installed and run on one machine. There is no public release yet, and Linux has no installer.
 - No dubbing, voice synthesis or lip sync.
 - macOS has not been tested. Windows and Linux are the supported targets.
 - FFmpeg and the speech recognition executable are supplied by you, not bundled yet.
