@@ -87,12 +87,12 @@ A debug build loads the interface from `http://127.0.0.1:5173`, so the dev serve
 A release build embeds the built interface and the media tools:
 
 ```sh
-bash scripts/bundle-tools.sh
+python scripts/bundle-tools.py
 cd apps/desktop
 npm run tauri build
 ```
 
-That writes the installer and the bundled binary. `npm run tauri build -- --no-bundle` skips the installer. The tools are copied from `.tools/bin` and `.tools/whisper/bin/Release` unless `DUBBIT_TOOLS_DIR` and `DUBBIT_WHISPER_DIR` say otherwise; they are not committed to the repository.
+That writes the installer and the bundled binary. `npm run tauri build -- --no-bundle` skips the installer. The tools come from the pinned entries in `models/tools.json`: the script downloads each archive once into `.tools/cache`, checks its size and SHA-256, and copies only the declared programs and libraries into `resources/bin`. Nothing of that is committed to the repository.
 
 Building the crate with plain `cargo build --release` is not enough: the binary keeps pointing at the dev server and expects the tools on `PATH`.
 
