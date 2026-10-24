@@ -3,6 +3,8 @@ AGENTS.md
 docs/planos/
 target/
 .tmp/
+node_modules/
+apps/desktop/src-tauri/gen/
 
 .venv/
 .tools/
