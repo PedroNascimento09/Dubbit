@@ -47,10 +47,10 @@ The window follows the system light or dark appearance and can be switched by ha
 
 ## Build and run from source
 
-Prerequisites are Rust, Node.js, and a folder holding FFmpeg, FFprobe and a `whisper-cli` build with its companion libraries.
+Prerequisites are Rust, Node.js and Python. The build fetches FFmpeg, FFprobe and `whisper-cli` itself from the pinned manifest.
 
 ```sh
-bash scripts/bundle-tools.sh
+python scripts/bundle-tools.py
 cd apps/desktop
 npm install
 npm run tauri build
