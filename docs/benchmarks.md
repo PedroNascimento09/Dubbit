@@ -194,26 +194,31 @@ the deciding factor, correctness was.
 | Field | Value |
 | --- | --- |
 | Date | 2026-10-24 |
-| Media | 9.92 s clip, English speech, `whisper-tiny-q5_1` |
 | Tool | `benchmarks/cue_speed.py` |
-| Cues | 3 |
-| Characters | 159 over 9.9 s |
-| Median | 16.4 characters per second |
-| 90th percentile | 29.0 characters per second |
-| Above 17 | 1 cue |
-| Above 21 | 1 cue |
+| Media 1 | 9.92 s clip, English, `whisper-tiny-q5_1` |
+| Media 2 | 155 LibriSpeech clips concatenated, 1425 s, English, `whisper-tiny-q5_1` |
+| System | Windows 11, 12 logical cores, 15 GB of RAM, no GPU |
 
-One cue is dense for its length because the speech itself is dense: splitting it
-into more cues cannot lower its characters per second, since the time is shared
-in proportion to the text. Layout keeps a one second floor and never runs past
-the segment, so the remaining fix is rewriting the line, which belongs to the
-dubbing milestone.
+| Media | Cues | Characters | Median | 90th pct | Above 17 | Above 21 |
+| --- | --- | --- | --- | --- | --- | --- |
+| 9.92 s clip | 3 | 159 | 16.4 | 29.0 | 1 | 1 |
+| 24 min corpus | 425 | 18642 | 11.7 | 28.3 | 116 | 103 |
+
+The corpus row is the honest one: 27% of cues sit above 17 characters per
+second and 24% above 21, so a reader is chasing the text for a quarter of the
+cues. Layout cannot fix this, because splitting a cue in proportion to its text
+leaves the speed unchanged, and the segment has no spare time to give. The
+available levers are rewriting the line during dubbing and, for subtitles, a
+reading-speed filter that reports the problem instead of hiding it.
 
 ### What this measurement does not say
 
-- One clip, one model, nine seconds. It shows the tool works and where the
-  ceiling sits, not the distribution over a real corpus.
-- Reading speed is measured on characters, not on how hard the words are.
+- The corpus is a concatenation of 155 clips with 0.35 s of silence between
+them, not one continuous recording, and the recogniser is the smallest model.
+  A different segmentation changes the cue boundaries and the percentages.
+- Reading speed is counted in characters, not in how hard the words are.
+- No second model was measured, so the effect of recognition quality on cue
+  density is unknown.
 
 ## Planned measurements
 
