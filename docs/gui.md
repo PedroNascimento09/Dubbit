@@ -52,16 +52,15 @@ Prerequisites are the same as the command line: Rust, FFmpeg, FFprobe and a `whi
 ```sh
 cd apps/desktop
 npm install
-npm run build
-cargo build -p dubbit-desktop
+npm run tauri build -- --no-bundle
 ```
 
-Then start the window with the same environment variables the command line uses:
+The build embeds the interface and leaves the binary in `target/release`. Start it with the same environment variables the command line uses:
 
 ```sh
 export DUBBIT_TOOLS_DIR=/path/to/tools
 export DUBBIT_ASR=/path/to/whisper-cli
-./target/debug/dubbit-desktop
+./target/release/dubbit-desktop
 ```
 
 For interface work, `npm run dev` serves the window in any browser with deterministic sample data, so layout and behaviour can be checked without building the shell. That preview never writes files.
