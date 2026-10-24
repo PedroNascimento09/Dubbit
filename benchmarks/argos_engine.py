@@ -18,7 +18,7 @@ def translator(source: str, target: str):
         item for item in installed if item.from_code == source and item.to_code == target
     )
     model = chosen.package_path / "model"
-    runtime = ctranslate2.Translator(str(model), device="cpu", compute_type="int8")
+    runtime = ctranslate2.Translator(str(model), device="cpu", compute_type="default")
     shim = Line()
 
     def one(text: str) -> str:
