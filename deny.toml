@@ -20,6 +20,7 @@ allow = [
   "Unlicense",
   "Zlib",
   "BSL-1.0",
+  "MPL-2.0",
 ]
 
 [bans]
@@ -27,7 +28,9 @@ multiple-versions = "warn"
 wildcards = "deny"
 
 [advisories]
-ignore = []
+ignore = [
+  { id = "RUSTSEC-2024-0370", reason = "glib-macros pulls it on Linux at build time; Tauri has no newer GTK binding and no runtime code is affected" },
+]
 
 [sources]
 unknown-registry = "deny"
