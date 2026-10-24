@@ -2,6 +2,19 @@
 
 All notable changes to this project are documented here. The format follows Keep a Changelog, and the project uses semantic versioning.
 
+## Unreleased
+
+### Added
+
+- Desktop window built with Tauri, with a drop area, language and model choices, and a stage list while a job runs.
+- Processing queue that persists across restarts, runs one job at a time, and returns an interrupted job to the queue.
+- Review editor with editable lines, search, per-line playback, and saving that rewrites every subtitle format.
+- Cancellation between stages, with finished stages kept for a retry.
+- Automatic model download before the first run, with progress shown in the window.
+- Light and dark appearance, remembered between launches, and reduced motion when the system asks for it.
+- Recovery screen for an unexpected interface failure, and a deterministic preview mode for interface work.
+- `pipeline::save_review` and `pipeline::write_subtitles` as the shared path for writing subtitles from edited lines.
+
 ## 0.1.0 - 2026-10-23
 
 ### Added
