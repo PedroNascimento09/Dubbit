@@ -46,13 +46,28 @@ machine, no Linux or macOS run. Accuracy is measured separately in
 Question: is a lightweight offline translator good enough for the launch
 languages, and what does it cost to run?
 
-State: open. Translation backends exist (passthrough, a local model server, and
-an external command), but no quality metric has been produced. No language has a
-grade.
+State: partly measured. Translation backends exist (passthrough, a local model
+server, and an external command). The first automatic numbers exist for English
+and Portuguese with the OPUS-MT weights as packaged by Argos Translate 1.9 on
+CTranslate2: chrF 68.45 and BLEU 49.18 for en → pt on 200 Tatoeba sentences,
+76.87 and 65.02 for pt → en, and 71.06 and 52.49 for en → pt on 200 Wikimedia
+sentences, 71.67 and 52.36 the other way. Cost is 0.06 to 0.19 seconds per
+sentence on CPU, which is negligible beside transcription. Methods, commands
+and limits are in [benchmarks](../benchmarks.md), Measurement 4.
 
-What closes it: a fixed evaluation set per language pair, an automatic metric
-computed by a script in the repository, and a written review by a speaker of
-each language.
+The Tatoeba numbers are optimistic because those sentences are very likely in
+the model's training data. The Wikimedia numbers are the fairer signal. No
+language has a grade yet, no human has read the output, and no other pair has a
+number.
+
+What closes it: a written review by a speaker per launch pair, numbers for the
+remaining pairs, and a decision on whether the product ships these weights
+in-process or keeps the existing server and command backends.
+
+Residual risk: the measurement ran the model directly, not through the product.
+The shipped path for a local translator command takes no arguments, so a Python
+script needs an executable wrapper on Windows; scripting the product against
+these weights is still to be done.
 
 ## S7 Voice synthesis in Rust
 
