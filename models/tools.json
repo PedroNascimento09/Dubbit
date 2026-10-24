@@ -1,0 +1,55 @@
+{
+  "schema": 1,
+  "tools": [
+    {
+      "name": "ffmpeg",
+      "version": "N-127957-g935f29eaae",
+      "licence": "LGPL-3.0-or-later",
+      "files": [
+        {
+          "platform": "windows-x64",
+          "url": "https://github.com/BtbN/FFmpeg-Builds/releases/download/autobuild-2026-10-23-13-04/ffmpeg-N-127957-g935f29eaae-win64-lgpl.zip",
+          "size": 177959584,
+          "sha256": "4c0e53a40ee844ea237f47060316aab077484af51c098eeab4f1a7b0ca9d1302",
+          "format": "zip",
+          "prefix": "ffmpeg-N-127957-g935f29eaae-win64-lgpl",
+          "binaries": ["bin/ffmpeg.exe", "bin/ffprobe.exe"]
+        },
+        {
+          "platform": "linux-x64",
+          "url": "https://github.com/BtbN/FFmpeg-Builds/releases/download/autobuild-2026-10-23-13-04/ffmpeg-N-127957-g935f29eaae-linux64-lgpl.tar.xz",
+          "size": 142412188,
+          "sha256": "284054601b2efbaebedb0c1b6aa32d72a494822eff80d734776d84dd69e8c829",
+          "format": "tar",
+          "prefix": "ffmpeg-N-127957-g935f29eaae-linux64-lgpl",
+          "binaries": ["bin/ffmpeg", "bin/ffprobe"]
+        }
+      ]
+    },
+    {
+      "name": "whisper",
+      "version": "b5454",
+      "licence": "MIT",
+      "files": [
+        {
+          "platform": "windows-x64",
+          "url": "https://github.com/ggml-org/whisper.cpp/releases/download/b5454/whisper-bin-x64.zip",
+          "size": 8928640,
+          "sha256": "6ba69e3482d7826214f90a6a9c84ca07782aec1e1d0c6a7c30c994fd5d816ccb",
+          "format": "zip",
+          "prefix": "",
+          "binaries": ["Release/whisper-cli.exe", "Release/whisper.dll", "Release/ggml*.dll"]
+        },
+        {
+          "platform": "linux-x64",
+          "url": "https://github.com/ggml-org/whisper.cpp/releases/download/b5454/whisper-bin-ubuntu-x64.tar.gz",
+          "size": 10364195,
+          "sha256": "a72becf15d7917f990f6313867a52638b82b7f9ef237fb0c980dac56a135781c",
+          "format": "tar",
+          "prefix": "whisper-bin-ubuntu-x64",
+          "binaries": ["whisper-cli", "libwhisper.so*", "libggml*.so*"]
+        }
+      ]
+    }
+  ]
+}
