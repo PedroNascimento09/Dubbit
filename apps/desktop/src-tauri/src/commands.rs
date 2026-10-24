@@ -7,7 +7,7 @@ use tauri::{AppHandle, Emitter, Manager, State};
 use dubbit_core::config::Settings;
 use dubbit_core::diagnostics;
 use dubbit_core::engines::translate;
-use dubbit_core::error::{engine_missing, DubbitError, Result};
+use dubbit_core::error::{engine_missing, filesystem_failed, DubbitError, Result};
 use dubbit_core::files::human_size;
 use dubbit_core::languages;
 use dubbit_core::media;
@@ -216,6 +216,43 @@ pub fn install_model(id: String, app: AppHandle) -> std::result::Result<String, 
         }
     })?;
     Ok(label)
+}
+
+fn open_folder(target: &Path) -> Result<()> {
+    let mut command = if cfg!(windows) {
+        let mut command = std::process::Command::new("explorer");
+        if target.is_dir() {
+            command.arg(target);
+        } else {
+            command.arg(format!("/select,{}", target.display()));
+        }
+        command
+    } else if cfg!(target_os = "macos") {
+        let mut command = std::process::Command::new("open");
+        command.arg("-R").arg(target);
+        command
+    } else {
+        let mut command = std::process::Command::new("xdg-open");
+        command.arg(target);
+        command
+    };
+    command
+        .spawn()
+        .map(|_| ())
+        .map_err(|error| filesystem_failed(target, &error.to_string()))
+}
+
+#[tauri::command]
+pub fn reveal(path: String) -> std::result::Result<(), CommandError> {
+    let target = PathBuf::from(&path);
+    if !target.exists() {
+        return Err(invalid(
+            "The folder no longer exists",
+            "Run the job again to recreate it.",
+        )
+        .into());
+    }
+    Ok(open_folder(&target)?)
 }
 
 #[tauri::command]
