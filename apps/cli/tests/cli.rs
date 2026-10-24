@@ -90,6 +90,46 @@ fn reports_a_model_that_is_not_installed() {
 }
 
 #[test]
+fn works_from_a_home_with_accents_and_spaces() {
+    let parent = tempfile::tempdir().unwrap();
+    let home = parent.path().join("Configuração do João");
+    let set = run(&home, &["config", "set", "profile", "light"]);
+    assert!(set.status.success(), "{}", text(&set));
+    assert!(home.join("config.json").is_file());
+    let show = run(&home, &["config", "show"]);
+    assert!(show.status.success());
+    assert!(text(&show).contains("light"));
+}
+
+#[test]
+#[ignore = "needs FFmpeg, whisper-cli, an installed model and DUBBIT_E2E_MEDIA"]
+fn subtitles_a_real_media_file() {
+    let media = std::env::var("DUBBIT_E2E_MEDIA").expect("set DUBBIT_E2E_MEDIA");
+    let home = std::env::var("DUBBIT_E2E_HOME")
+        .expect("set DUBBIT_E2E_HOME, a folder with an installed model");
+    let home = std::path::PathBuf::from(home);
+    let output = tempfile::tempdir().unwrap();
+    let project = output.path().join("clipe de teste.dubbit");
+    let result = run(
+        &home,
+        &[
+            "dub",
+            &media,
+            "--from",
+            "en",
+            "--no-translate",
+            "--output",
+            &project.display().to_string(),
+        ],
+    );
+    assert!(result.status.success(), "{}", text(&result));
+    let subtitle = project.join("subtitles").join("en.srt");
+    let body = std::fs::read_to_string(&subtitle).expect("subtitle file");
+    assert!(body.contains("-->"));
+    assert!(body.split_whitespace().count() > 10);
+}
+
+#[test]
 fn json_errors_keep_the_shape() {
     let home = tempfile::tempdir().unwrap();
     let output = run(home.path(), &["dub", "missing-file.mp4", "--json"]);
