@@ -10,6 +10,9 @@ corpus exists.
 | --- | --- |
 | `librispeech_corpus.py` | Samples chapters from an extracted LibriSpeech folder, converts clips to 16 kHz mono WAV with a short silence between them, and writes the concatenation list and the normalised reference transcript |
 | `wer.py` | Reads a subtitle file and a reference transcript, normalises both, and prints word error rate with substitutions, deletions and insertions |
+| `translation_quality.py` | Samples a parallel corpus, translates every source sentence with the local model, and prints chrF, BLEU, segment count and time per segment |
+| `argos_engine.py` | Loads the installed translation model through CTranslate2 and returns a function that translates one sentence |
+| `argos_line.py` | Reads one line on standard input and writes the translation on standard output, so it can serve as the product's command backend on Linux and macOS |
 
 ## Corpus
 
@@ -47,6 +50,23 @@ python benchmarks/wer.py \
 Repeat the last two commands for each model. Keep the run folder until the
 numbers are written down; every claim in `docs/benchmarks.md` points at a run
 made this way.
+
+## Translation corpus
+
+The translation numbers use Tatoeba en-pt, version 2023-04-12, licensed CC BY
+2.0 FR, and Wikimedia en-pt, version 20230407, licensed CC BY-SA. Both are
+downloaded by the script on first use into `.tools/benchmarks`, outside the
+repository. The sample is deterministic: pairs where both sides are between 20
+and 200 characters, one sentence per source text, shuffled with seed 2026.
+
+The engine is installed with `pip install argostranslate` and one language
+package per direction; both are development dependencies of the benchmark, not
+of the product.
+
+```sh
+python benchmarks/translation_quality.py --corpus tatoeba --source en --target pt --limit 200
+python benchmarks/translation_quality.py --corpus wikimedia --source pt --target en --limit 200
+```
 
 ## Interpretation
 
