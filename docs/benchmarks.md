@@ -151,12 +151,11 @@ python benchmarks/translation_quality.py --corpus wikimedia --source pt --target
   the two Tatoeba rows are optimistic. The Wikimedia rows are the more honest
   signal for real text.
 - Only English and Portuguese. Spanish, French and German have no number, and
-  neither does any pair reached through a pivot language.
-- Nothing was measured through the product's own pipeline. The benchmark runs
-  the model directly, because the shipped path offers a local server or an
-  external command, and this machine has neither wired to a model. Subtitle
-  segment boundaries, glossary protection and cue splitting are outside the
-  measurement.
+  neither does any pair reached through a pivot language.- The scores come from running the model directly. The shipped translation
+  stage was exercised separately, once, through the same engine behind the
+  local server protocol, and produced translated SRT and VTT files; the effect
+  of subtitle segment boundaries, glossary protection and cue splitting on
+  quality is still unmeasured.
 - Tatoeba and Wikimedia sentences are already clean text. Speech that has been
   transcribed with errors will translate worse, and that compounding is not
   measured here.
