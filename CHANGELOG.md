@@ -16,7 +16,10 @@ All notable changes to this project are documented here. The format follows Keep
 - `pipeline::save_review` and `pipeline::write_subtitles` as the shared path for writing subtitles from edited lines.
 - Windows installer that bundles FFmpeg, FFprobe and the speech recogniser, installs for the current user, and needs no environment variables.
 - Bundled tools are found from the application resource folder, so an installed window runs without any setup.
-- `scripts/bundle-tools.sh` stages the media tools for the installer, `scripts/checksums.py` writes SHA-256 side files, and `scripts/sbom.py` writes a CycloneDX bill of materials from the Cargo graph.
+- `models/tools.json` pins the bundled programs by URL, byte size, SHA-256 and licence. `scripts/bundle-tools.py` downloads each archive once, verifies it and stages only the declared programs and libraries, for Windows and Linux.
+- The installer ships the licence text of every bundled program in a `licenses` folder, and the FFmpeg build is now the LGPL variant without GPL-only components.
+- `scripts/checksums.py` writes SHA-256 side files, and `scripts/sbom.py` writes a CycloneDX bill of materials from the Cargo graph.
+- Release workflow builds the Windows installer, a portable Windows package, a Linux `.deb` and AppImage, the command line archives, one checksum file and the bill of materials, and publishes them together.
 - Test that the command line works from a data folder with accents and spaces, and an ignored end-to-end test that subtitles a real media file when the tools are present.
 
 ### Changed
