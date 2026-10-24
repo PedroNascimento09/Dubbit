@@ -47,18 +47,25 @@ Question: is a lightweight offline translator good enough for the launch
 languages, and what does it cost to run?
 
 State: partly measured. Translation backends exist (passthrough, a local model
-server, and an external command). The first automatic numbers exist for English
-and Portuguese with the OPUS-MT weights as packaged by Argos Translate 1.9 on
-CTranslate2: chrF 68.45 and BLEU 49.18 for en → pt on 200 Tatoeba sentences,
-76.87 and 65.02 for pt → en, and 71.06 and 52.49 for en → pt on 200 Wikimedia
-sentences, 71.67 and 52.36 the other way. Cost is 0.06 to 0.19 seconds per
-sentence on CPU, which is negligible beside transcription. Methods, commands
-and limits are in [benchmarks](../benchmarks.md), Measurement 4.
+server, and an external command). Automatic numbers now cover the five launch
+candidates, each way against English, with the OPUS-MT weights as packaged by
+Argos Translate 1.9 on CTranslate2 at float32. On 200 Wikimedia sentences the
+chrF is 71.06 for en → pt, 71.67 for pt → en, 70.46 for en → es, 71.71 for
+es → en, 68.99 for en → fr, 68.43 for fr → en, 62.51 for en → de and 66.30 for
+de → en; BLEU follows the same order. Tatoeba scores are three to seven points
+higher for every pair. German is the weakest pair and the only one under 65
+chrF on real text. Cost is 0.05 to 0.33 seconds per sentence on CPU, negligible
+beside transcription. Methods, commands, the full table and limits are in
+[benchmarks](../benchmarks.md), Measurement 4.
 
 The Tatoeba numbers are optimistic because those sentences are very likely in
 the model's training data. The Wikimedia numbers are the fairer signal. No
-language has a grade yet, no human has read the output, and no other pair has a
-number.
+language has a grade yet and no human has read the output.
+
+Measured the hard way: int8 quantisation makes the Spanish to English package
+loop forever, so the safe setting is float32. That costs speed the CPU profile
+was counting on, and any runtime choice has to be tested package by package
+rather than assumed.
 
 What closes it: a written review by a speaker per launch pair, numbers for the
 remaining pairs, and a decision on whether the product ships these weights
